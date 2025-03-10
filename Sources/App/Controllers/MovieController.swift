@@ -18,6 +18,15 @@ struct MovieController: RouteCollection {
     }
 
     @Sendable
+    func detail(req: Request) async throws -> [MovieDTO] {
+        guard let movie: Movie = try await Movie.find(req.parameters.get("movieID"), on: req.db) else { 
+            throw Abort(.notFound)
+        }
+        return [movie.toDTO()]
+    }
+
+
+    @Sendable
     func create(req: Request) async throws -> MovieDTO {
         let movie = try req.content.decode(MovieDTO.self).toModel()
 
