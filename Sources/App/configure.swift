@@ -48,7 +48,7 @@ public func configure(_ app: Application) async throws {
     // Migrations
     app.migrations.add(CreateInitialTables())
 
-    
+    app.asyncCommands.use(LoadDataCommand(), as: "import")
     // Views
     app.views.use(.leaf)
     // register routes
