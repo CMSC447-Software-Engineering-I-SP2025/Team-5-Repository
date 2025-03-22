@@ -12,7 +12,16 @@ public func configure(_ app: Application) async throws {
     // Ensure encoder convers to/from camel/snake cases
     let encoder = JSONEncoder()
     encoder.keyEncodingStrategy = .convertToSnakeCase
-    encoder.dateEncodingStrategy = .iso8601
+    encoder.dateEncodingStrategy = .custom { date, encoder in
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd"
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.timeZone = TimeZone(secondsFromGMT: 0)
+
+        var container = encoder.singleValueContainer()
+        let dateString = formatter.string(from: date)
+        try container.encode(dateString)
+    }
     
     let decoder = JSONDecoder()
 //    decoder.keyDecodingStrategy = .convertFromSnakeCase
