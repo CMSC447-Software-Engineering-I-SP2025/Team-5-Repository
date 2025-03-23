@@ -9,7 +9,7 @@ struct MovieIndexQuery: Content {
         case page, perPage = "per_page"
     }
 }
-struct MovieIndexResponse: Codable {
+struct MovieIndexResponse: Content {
     var currentPage: Int
     var totalPages: Int
     var movies: [ListMovieDTO]
@@ -38,22 +38,22 @@ struct MovieController: RouteCollection {
         let perPage = query.perPage ?? 36
         
         let movies = try await Movie.query(on: req.db)
-            .range((page * perPage)..<((page + 1) * perPage))
+            .range(((page - 1) * perPage)..<(page * perPage))
             .with(\.$genres)
             .all()
             .compactMap({ $0.toListDTO() })
         
         let totalPages = try await Movie.query(on: req.db).count() / perPage
         var resp = Response(status: .ok)
+        let pageInfo = MovieIndexResponse(currentPage: page,
+                                          totalPages: totalPages,
+                                          movies: movies)
         if req.headers.accept.contains(where: { $0.mediaType == .html }) {
-            let pageInfo = MovieIndexResponse(currentPage: page,
-                                              totalPages: totalPages,
-                                              movies: movies)
             let view: View = try await req.view.render("movies_index", pageInfo)
             resp.headers.contentType = .html
             resp.body = .init(buffer: view.data)
         } else {
-            try resp.content.encode(movies)
+            try resp.content.encode(pageInfo)
             resp.headers.contentType = .json
         }
         return resp

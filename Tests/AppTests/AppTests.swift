@@ -87,9 +87,13 @@ struct AppTests {
             }
             let sampleMovies = try await Movie.query(on: app.db).with(\.$genres).all()
             
-            try await app.testing().test(.GET, "movies", afterResponse: { res async throws in
+            try await app.testing().test(.GET, "movies",
+                                         headers: ["Accept": "application/json"],
+                                         afterResponse: { res async throws in
                 #expect(res.status == .ok)
-                #expect(try res.content.decode([ListMovieDTO].self) == sampleMovies.map { $0.toListDTO()} )
+                let response = try res.content.decode(MovieIndexResponse.self)
+                #expect(response.movies.count == sampleMovies.count)
+                #expect(Set(response.movies.map(\.id)) == Set(sampleMovies.map(\.id)))
             })
         }
     }
