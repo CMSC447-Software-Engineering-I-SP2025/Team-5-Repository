@@ -24,19 +24,6 @@ final class MovieCast: Model, @unchecked Sendable {
     
     @Field(key: "credit_id")
     var creditId: String
-    
-    init() {}
-    
-    init(id: UUID? = nil, movie: Movie, cast: Person, movieCastId: Int,
-         character: String, castOrder: Int, creditId: String) {
-        self.id = id
-        self.movie = movie
-        self.cast = cast
-        self.movieCastId = movieCastId
-        self.character = character
-        self.castOrder = castOrder
-        self.creditId = creditId
-    }
 }
 
 extension MovieCast {

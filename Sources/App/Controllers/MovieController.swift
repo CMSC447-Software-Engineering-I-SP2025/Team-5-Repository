@@ -9,6 +9,7 @@ struct MovieController: RouteCollection {
         movies.post(use: self.create)
         movies.group(":movieID") { movie in
             movie.delete(use: self.delete)
+            movie.get(use: self.detail)
         }
     }
     

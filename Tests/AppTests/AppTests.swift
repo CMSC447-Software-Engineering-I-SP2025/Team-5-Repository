@@ -94,35 +94,73 @@ struct AppTests {
         }
     }
     
-//    @Test("Creating a Movie")
-//    func createMovie() async throws {
-//        let newDTO = MovieDTO(id: nil, title: "test")
-//        
-//        try await withApp { app in
-//            try await app.testing().test(.POST, "movies", beforeRequest: { req in
-//                try req.content.encode(newDTO)
-//            }, afterResponse: { res async throws in
-//                #expect(res.status == .ok)
-//                let models = try await Movie.query(on: app.db).all()
-//                #expect(models.map({ $0.toDTO().title }) == [newDTO.title])
-//            })
-//        }
-//    }
-//    
-//    @Test("Deleting a Movie")
-//    func deleteMovie() async throws {
-//        let testMovies = [Movie(title: "test1"), Movie(title: "test2")]
-//        
-//        try await withApp { app in
-//            try await testMovies.create(on: app.db)
-//            
-//            try await app.testing().test(.DELETE, "movies/\(testMovies[0].requireID())", afterResponse: { res async throws in
-//                #expect(res.status == .noContent)
-//                let model = try await Movie.find(testMovies[0].id, on: app.db)
-//                #expect(model == nil)
-//            })
-//        }
-//    }
+    @Test("Creating a Movie")
+    func createMovie() async throws {
+        let newDTO = try Self.decoder.decode(MovieDTO.self,
+                                             from: SampleData.testMovie1.data(using: .utf8)!)
+        
+        try await withApp { app in
+            try await app.testing().test(.POST, "movies", beforeRequest: { req in
+                try req.content.encode(newDTO)
+            }, afterResponse: { res async throws in
+                #expect(res.status == .ok)
+                let models = try await Movie.query(on: app.db)
+                    .with(\.$genres).all()
+                #expect(models.map({ $0.toListDTO().title }) == [newDTO.title])
+            })
+        }
+    }
+    
+    @Test("Deleting a Movie")
+    func deleteMovie() async throws {
+        try await withApp { app in
+            let sampleData = [SampleData.testMovie1, SampleData.testMovie2]
+            let _ = try await sampleData.asyncMap {
+                let data = try Self.decoder.decode(MovieDTO.self,
+                                                   from: $0.data(using: .utf8)!)
+                return try await Movie.createOrUpdate(on: app.db, from: data)
+            }
+            let testMovies = try await Movie.query(on: app.db).with(\.$genres).all()
+            
+            
+            try await app.testing().test(.DELETE, "movies/\(testMovies[0].requireID())", afterResponse: { res async throws in
+                #expect(res.status == .noContent)
+                let model = try await Movie.find(testMovies[0].id, on: app.db)
+                #expect(model == nil)
+            })
+        }
+    }
+    
+    @Test("Movie Detail")
+    func movieDetail() async throws {
+        try await withApp { app in
+            let sampleData = [SampleData.testMovie1, SampleData.testMovie2]
+            let _ = try await sampleData.asyncMap {
+                let data = try Self.decoder.decode(MovieDTO.self,
+                                                   from: $0.data(using: .utf8)!)
+                return try await Movie.createOrUpdate(on: app.db, from: data)
+            }
+            let testMovies = try await Movie.query(on: app.db)
+                .with(\.$genres)
+                .with(\.$cast)
+                .with(\.$cast.$pivots, { $0.with(\.$cast) })
+                .with(\.$directors)
+                .with(\.$directors.$pivots, { $0.with(\.$director) })
+                .all()
+            try await app.testing().test(.GET, "/movies/\(testMovies[0].requireID())") { res in
+                #expect(res.status == .ok)
+                let dto = try res.content.decode(MovieDTO.self)
+                
+                #expect(dto.title == testMovies[0].title)
+                #expect(dto.overview == testMovies[0].overview)
+                #expect(dto.cast.count == testMovies[0].cast.count)
+                #expect(dto.directors.count == testMovies[0].directors.count)
+                #expect(Set(dto.genres.map(\.id)) == Set(testMovies[0].genres.map(\.id)))
+                #expect(Set(dto.cast.map(\.id)) == Set(testMovies[0].cast.map(\.id)))
+                #expect(Set(dto.directors.map(\.id)) == Set(testMovies[0].directors.map(\.id)))
+            }
+        }
+    }
 }
 
 extension ListMovieDTO: Equatable {
