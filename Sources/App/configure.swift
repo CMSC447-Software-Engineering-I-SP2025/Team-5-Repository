@@ -59,7 +59,9 @@ public func configure(_ app: Application) async throws {
 
     app.asyncCommands.use(LoadDataCommand(), as: "import")
     // Views
+    
     app.views.use(.leaf)
+    
     // register routes
     try routes(app)
 }
