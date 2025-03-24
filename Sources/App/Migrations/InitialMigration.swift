@@ -133,7 +133,6 @@ struct CreateInitialTables: AsyncMigration {
     
     func revert(on database: Database) async throws {
         try? await database.schema("movie_director").delete()
-        try? await database.schema("people").delete()
         try? await database.schema("movie_genres").delete()
         try? await database.schema("genres").delete()
         try? await database.schema("movie_production_company").delete()
@@ -143,6 +142,7 @@ struct CreateInitialTables: AsyncMigration {
         try? await database.schema("movie_spoken_language").delete()
         try? await database.schema("spoken_languages").delete()
         try? await database.schema("movie_cast").delete()
+        try? await database.schema("people").delete()
         try? await database.schema("movies").delete()
         try? await database.schema("collections").delete()
     }
