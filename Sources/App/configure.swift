@@ -7,8 +7,42 @@ import Vapor
 // configures your application
 public func configure(_ app: Application) async throws {
     // uncomment to serve files from /Public folder
-    // app.middleware.use(FileMiddleware(publicDirectory: app.directory.publicDirectory))
+    app.middleware.use(FileMiddleware(publicDirectory: app.directory.publicDirectory))
+    
+    // Ensure encoder convers to/from camel/snake cases
+    let encoder = JSONEncoder()
+    encoder.keyEncodingStrategy = .convertToSnakeCase
+    encoder.dateEncodingStrategy = .custom { date, encoder in
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd"
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.timeZone = TimeZone(secondsFromGMT: 0)
 
+        var container = encoder.singleValueContainer()
+        let dateString = formatter.string(from: date)
+        try container.encode(dateString)
+    }
+    
+    let decoder = JSONDecoder()
+//    decoder.keyDecodingStrategy = .convertFromSnakeCase
+    decoder.dateDecodingStrategy = .custom { decoder in
+        let container = try decoder.singleValueContainer()
+        let dateString = try container.decode(String.self)
+        
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd"
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.timeZone = TimeZone(secondsFromGMT: 0)
+        
+        if let date = formatter.date(from: dateString) {
+            return date
+        } else {
+            throw DecodingError.dataCorruptedError(in: container, debugDescription: "Invalid date format: \(dateString)")
+        }
+    }
+    ContentConfiguration.global.use(encoder: encoder, for: .json)
+    ContentConfiguration.global.use(decoder: decoder, for: .json)
+    
     app.databases.use(DatabaseConfigurationFactory.postgres(configuration: .init(
         hostname: Environment.get("DATABASE_HOST") ?? "localhost",
         port: Environment.get("DATABASE_PORT").flatMap(Int.init(_:)) ?? SQLPostgresConfiguration.ianaPortNumber,
@@ -18,11 +52,16 @@ public func configure(_ app: Application) async throws {
         tls: .disable)
     ), as: .psql)
 
-    app.migrations.add(CreateMovie())
+    app.routes.defaultMaxBodySize = "10mb"
+    
+    // Migrations
+    app.migrations.add(CreateInitialTables())
 
+    app.asyncCommands.use(LoadDataCommand(), as: "import")
+    // Views
+    
     app.views.use(.leaf)
-
-
+    
     // register routes
     try routes(app)
 }
