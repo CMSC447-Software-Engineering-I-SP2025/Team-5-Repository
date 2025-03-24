@@ -1,5 +1,4 @@
 import Vapor
-import ZIPFoundation
 import Foundation
 
 struct LoadDataCommand: AsyncCommand {
@@ -25,8 +24,8 @@ struct LoadDataCommand: AsyncCommand {
         var destinationURL = URL(fileURLWithPath: currentWorkingPath)
         
         do {
-            try fileManager.createDirectory(at: destinationURL, withIntermediateDirectories: true, attributes: nil)
-            try fileManager.unzipItem(at: sourceURL, to: destinationURL)
+            let res = try await runShellCommand("unzip tmdb_dump_2025-03-12.zip")
+            context.console.print(res)
         } catch {
             print("Extraction of ZIP archive failed with error:\(error)")
         }
@@ -68,3 +67,46 @@ struct LoadDataCommand: AsyncCommand {
     }
 }
 
+
+/// Runs a shell command asynchronously and returns its output as a String.
+/// - Parameter command: The shell command to execute.
+/// - Returns: The standard output (or combined output in case of an error) from the command.
+/// - Throws: An error if the command fails to run or returns a non-zero exit status.
+func runShellCommand(_ command: String) async throws -> String {
+    try await withCheckedThrowingContinuation { continuation in
+        let process = Process()
+        // Use bash to run the command.
+        process.executableURL = URL(fileURLWithPath: "/bin/bash")
+        process.arguments = ["-c", command]
+        
+        // Pipe to capture both standard output and standard error.
+        let pipe = Pipe()
+        process.standardOutput = pipe
+        process.standardError = pipe
+        
+        // This closure is called when the process terminates.
+        process.terminationHandler = { process in
+            // Read the complete output from the pipe.
+            let data = pipe.fileHandleForReading.readDataToEndOfFile()
+            let output = String(data: data, encoding: .utf8) ?? ""
+            // Check if the command was successful.
+            if process.terminationStatus == 0 {
+                continuation.resume(returning: output)
+            } else {
+                let error = NSError(
+                    domain: "ShellCommandError",
+                    code: Int(process.terminationStatus),
+                    userInfo: [NSLocalizedDescriptionKey: output]
+                )
+                continuation.resume(throwing: error)
+            }
+        }
+        
+        // Start the process.
+        do {
+            try process.run()
+        } catch {
+            continuation.resume(throwing: error)
+        }
+    }
+}

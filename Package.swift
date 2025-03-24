@@ -17,9 +17,7 @@ let package = Package(
         .package(url: "https://github.com/vapor/leaf.git", from: "4.3.0"),
         // 🔵 Non-blocking, event-driven networking for Swift. Used for custom executors
         .package(url: "https://github.com/apple/swift-nio.git", from: "2.65.0"),
-        
-        // Open zip files
-        .package(url: "https://github.com/weichsel/ZIPFoundation.git", .upToNextMajor(from: "0.9.0"))
+      
     ],
     targets: [
         .executableTarget(
@@ -31,7 +29,6 @@ let package = Package(
                 .product(name: "Vapor", package: "vapor"),
                 .product(name: "NIOCore", package: "swift-nio"),
                 .product(name: "NIOPosix", package: "swift-nio"),
-                .product(name: "ZIPFoundation", package: "ZIPFoundation")
             ],
             swiftSettings: swiftSettings
         ),
