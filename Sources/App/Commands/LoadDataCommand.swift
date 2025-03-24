@@ -59,7 +59,7 @@ struct LoadDataCommand: AsyncCommand {
         // decode
         let parsedData = try decoder.decode([String: MovieDTO].self, from: fileData)
         
-        for (key, movie) in parsedData {
+        try await parsedData.asyncForEach { key, movie in
             context.console.print(key)
             _ = try await Movie.createOrUpdate(on: context.application.db,
                                                from: movie)
@@ -107,6 +107,26 @@ func runShellCommand(_ command: String) async throws -> String {
             try process.run()
         } catch {
             continuation.resume(throwing: error)
+        }
+    }
+}
+extension Sequence {
+    /// Processes each element asynchronously with a concurrency limit of 8.
+    /// - Parameter body: An async throwing closure to process each element.
+    /// - Throws: Rethrows any error produced by the async closure.
+    func asyncForEach(_ body: @escaping (Element) async throws -> Void) async throws {
+        let semaphore = DispatchSemaphore(value: 8)
+        try await withThrowingTaskGroup(of: Void.self) { group in
+            for element in self {
+                // Wait until there's an available "worker" slot.
+                semaphore.wait()
+                group.addTask {
+                    defer { semaphore.signal() }
+                    try await body(element)
+                }
+            }
+            // Wait for all tasks to finish.
+            for try await _ in group { }
         }
     }
 }
