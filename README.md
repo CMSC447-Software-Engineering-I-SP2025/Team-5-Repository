@@ -22,6 +22,11 @@ Before running, you need to run the migration
 swift run App migrate
 ```
 
+After running the migration, we can import data.  (If this fails, just re-run it, there's a small race condition on initial imports)
+```bash
+swift run App import
+```
+
 Run the app
 ```bash
 swift run [App]

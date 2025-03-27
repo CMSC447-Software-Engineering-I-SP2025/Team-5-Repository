@@ -25,6 +25,14 @@ Next we need to create the database itself for the app.
 createdb -O movies_user movies_database
 ```
 
+Next we need to modify permissions (for running unit tests), so run the following to access postgres and update permissions
+
+```bash
+psql postgres
+postgres=> alter user movies_user createdb;
+postgres=> exit
+```
+
 Now we're good to go to build the app.
 #### Optional
 Install Postico (Postgres GUI)
@@ -67,10 +75,10 @@ Target: x86_64-unknown-linux-gnu
 ```
 
 #### Install PostgreSQL
-Install PostgreSQL with apt
+Install PostgreSQL and Unzip with apt
 ```bash
 sudo apt update && sudo apt -y upgrade
-sudo apt install postgresql
+sudo apt install postgresql unzip
 ```
 
 Start PostgreSQL
@@ -88,11 +96,24 @@ Next we need to create a database user for the app, use the password `movies`
 ```bash
 createuser -P movies_user
 ```
+Then we will update the user's permissions by entering postgresql
+```bash
+psql postgres
+postgres=> alter user movies_user createdb;
+postgres=> exit
+```
 
 Finally we need to create the database itself for the app.
 ```bash
 createdb -O movies_user movies_database
 ```
+
+Then we can exit the sudo bash with 
+```bash
+exit
+```
+
+
 
 
 #### Install VSCode
