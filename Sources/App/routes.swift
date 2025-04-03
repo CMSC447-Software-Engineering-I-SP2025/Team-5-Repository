@@ -10,17 +10,18 @@ func routes(_ app: Application) throws {
         "Hello, world!"
     }
 
-    app.get("people", ":id") { req async throws -> PersonDTO in
-        guard let personID = req.parameters.get("id", as: Int.self) else {
-            throw Abort(.badRequest, reason: "Error, Invalid ID")
+    app.get("people", ":personID") { req async throws -> PersonDTO in
+        guard let personID = req.parameters.get("personID", as: Int.self) else {
+            throw Abort(.badRequest, reason: "Error, invalid ID")
         }
 
-        guard let person = try await Person.find(personID, on: req.db) else {
+        guard let person = try await Person.find(personID, on: req.db).map(\.personDTO) else {
             throw Abort(.notFound, reason: "Person not found")
         }
 
-        return PersonDTO(from: person)
+        return person
     }
+
 
     try app.register(collection: MovieController())
 }

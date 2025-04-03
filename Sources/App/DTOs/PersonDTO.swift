@@ -10,15 +10,19 @@ struct PersonDTO: Content {
     var originalName: String
     var popularity: Double
     var profilePath: String?
+}
 
-    init(from person: Person) {
-        self.id = person.id
-        self.adult = person.adult
-        self.gender = person.gender
-        self.knownForDepartment = person.knownForDepartment
-        self.name = person.name
-        self.originalName = person.originalName
-        self.popularity = person.popularity
-        self.profilePath = person.profilePath
+extension Person {
+    var personDTO: PersonDTO {
+        PersonDTO(
+            id: self.id,
+            adult: self.adult,
+            gender: self.gender,
+            knownForDepartment: self.knownForDepartment,
+            name: self.name,
+            originalName: self.originalName,
+            popularity: self.popularity,
+            profilePath: self.profilePath
+        )
     }
 }
