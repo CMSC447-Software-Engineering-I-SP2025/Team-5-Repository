@@ -44,19 +44,13 @@ struct MovieController: RouteCollection {
             .compactMap({ $0.toListDTO() })
         
         let totalPages = try await Movie.query(on: req.db).count() / perPage
-        var resp = Response(status: .ok)
         let pageInfo = MovieIndexResponse(currentPage: page,
                                           totalPages: totalPages,
                                           movies: movies)
-        if req.headers.accept.contains(where: { $0.mediaType == .html }) {
-            let view: View = try await req.view.render("movies_index", pageInfo)
-            resp.headers.contentType = .html
-            resp.body = .init(buffer: view.data)
-        } else {
-            try resp.content.encode(pageInfo)
-            resp.headers.contentType = .json
-        }
-        return resp
+        
+        return try await jsonOrHTML(request: req,
+                                    templateName: "movies_index",
+                                    value: pageInfo)
     }
     
     @Sendable
