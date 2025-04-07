@@ -174,7 +174,7 @@
                     </div>
                     <div class="movie-info">
                         <h2 class="movie-title">#(movie.title)</h2>
-                        <div class="movie-year">#date(movie.release_date, "YYYY-MM-dd")</div>
+                        <div class="movie-year">#(movie.release_date)</div>
                         
                         #if(count(movie.genres) > 0):
                         <div class="genres">
