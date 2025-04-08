@@ -27,6 +27,13 @@ final class Person: Model, @unchecked Sendable {
     
     @Field(key: "profile_path")
     var profilePath: String?
+
+    @Siblings(through: MovieCast.self, from: \.$cast, to: \.$movie)
+    var actedIn: [Movie]
+
+    @Siblings(through: MovieDirector.self, from: \.$director, to: \.$movie)
+    var directed: [Movie]
+
     
     init() {}
     init(id: Int,
