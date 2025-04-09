@@ -164,6 +164,69 @@
     <body>
         <h1>Movie List</h1>
         
+        <!-- Filter Controls -->
+        <form class="filter-form" method="GET" action="/movies">
+            <div>
+                <label for="minimum_rating">Minimum Rating (0-10):</label>
+                <input type="number" id="minimum_rating" name="minimum_rating" min="0" max="10" step="0.1" value="#(query.minimum_rating)" placeholder="e.g., 7.5">
+            </div>
+            <div>
+                <label for="start_date">Date Range Start:</label>
+                <input type="date" id="start_date" name="start_date" value=
+                #if(query.start_date):
+                #date(query.start_date, "YYYY-MM-dd")
+                #endif
+                >
+                <label for="end_date">End:</label>
+                <input type="date" id="end_date" name="end_date" value=
+                    #if(query.end_date):
+                    #date(query.end_date, "YYYY-MM-dd")
+                    #endif
+                >
+            </div>
+            <div>
+                <label for="selected_genres">Genres:</label>
+                <select id="selected_genres" name="selected_genres" multiple>
+                    #for(genre in genres):
+                    <option value="#(genre.id)"
+                        #if(query.selected_genres): #if(contains(query.selected_genres, genre.id)):
+                                selected
+                        #endif #endif
+                        >
+                        #(genre.name)
+                    </option>
+                    #endfor
+                </select>
+                <label for="selected_countries">Production Country:</label>
+                <select id="selected_countries" name="selected_countries" multiple>
+                    #for(country in countries):
+                    <option value="#(country.iso_3166_1)"
+                        #if(query.selected_countries): #if(contains(query.selected_countries, country.iso_3166_1)):
+                            selected
+                        #endif #endif
+                        >
+                        #(country.name)
+                    </option>
+                    #endfor
+                </select>
+                <label for="selected_languages">Languages:</label>
+                <select id="selected_languages" name="selected_languages" multiple>
+                    #for(language in languages):
+                    <option value="#(language.iso_639_1)"
+                        #if(query.selected_languages): #if(contains(query.selected_languages, language.iso_639_1)):
+                        selected
+                        #endif #endif
+                        >
+                        #(language.english_name)
+                    </option>
+                    #endfor
+                </select>
+            </div>
+            <div>
+                <button type="submit">Apply Filters</button>
+            </div>
+        </form>
+        
         #if(count(movies) > 0):
         <div class="movie-grid">
             #for(movie in movies):
@@ -194,16 +257,25 @@
         </div>
         
         <div class="pagination">
-            #if(current_page > 1):
-            <a href="?page=#(current_page - 1)&per_page=#(per_page)" class="pagination-button">Previous</a>
+            #if(query.page > 1):
+            <a
+                href="/movies?page=#(query.page - 1)&per_page=#(query.per_page)#if(query.minimum_rating):&min_rating=#(query.minimum_rating)#endif#if(query.start_date):&start_date=#date(query.start_date, "YYYY-MM-dd")#endif#if(query.end_date):&end_date=#date(query.end_date, "YYYY-MM-dd")#endif#if(query.selected_genres):#for(genre in query.selected_genres):&selected_genres=#(genre)#endfor#endif#if(query.selected_countries):#for(country in query.selected_countries):&selected_countries=#(country)#endfor#endif#if(query.selected_languages):#for(language in query.selected_languages):&selected_languages=#(language)#endfor#endif"
+                class="pagination-button">
+                Previous
+            </a>
             #else:
             <button disabled class="pagination-button">Previous</button>
             #endif
             
-            <span class="page-info">Page #(current_page) of #(total_pages)</span>
+            <span class="page-info">Page #(query.page) of #(pages)</span>
             
-            #if(current_page < total_pages):
-                <a href="?page=#(current_page + 1)&per_page=36" class="pagination-button">Next</a>
+            #if(query.page < pages):
+                <a
+                href="/movies?page=#(query.page + 1)&per_page=#(query.per_page)#if(query.minimum_rating):&min_rating=#(query.minimum_rating)#endif#if(query.start_date):&start_date=#date(query.start_date, "YYYY-MM-dd")#endif#if(query.end_date):&end_date=#date(query.end_date, "YYYY-MM-dd")#endif#if(query.selected_genres):#for(genre in query.selected_genres):&selected_genres=#(genre)#endfor#endif#if(query.selected_countries):#for(country in query.selected_countries):&selected_countries=#(country)#endfor#endif#if(query.selected_languages):#for(language in query.selected_languages):&selected_languages=#(language)#endfor#endif"
+                
+                class="pagination-button">
+                Next
+                </a>
             #else:
                 <button disabled class="pagination-button">Next</button>
             #endif

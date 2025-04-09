@@ -24,7 +24,7 @@ public func configure(_ app: Application) async throws {
     }
     
     let decoder = JSONDecoder()
-//    decoder.keyDecodingStrategy = .convertFromSnakeCase
+    decoder.keyDecodingStrategy = .convertFromSnakeCase
     decoder.dateDecodingStrategy = .custom { decoder in
         let container = try decoder.singleValueContainer()
         let dateString = try container.decode(String.self)
@@ -42,6 +42,23 @@ public func configure(_ app: Application) async throws {
     }
     ContentConfiguration.global.use(encoder: encoder, for: .json)
     ContentConfiguration.global.use(decoder: decoder, for: .json)
+
+    let urldecoder = URLEncodedFormDecoder(configuration: .init(dateDecodingStrategy: .custom { decoder in
+        let container = try decoder.singleValueContainer()
+        let dateString = try container.decode(String.self)
+        
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd"
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.timeZone = TimeZone(secondsFromGMT: 0)
+        
+        if let date = formatter.date(from: dateString) {
+            return date
+        } else {
+            throw DecodingError.dataCorruptedError(in: container, debugDescription: "Invalid date format: \(dateString)")
+        }
+    }))
+    ContentConfiguration.global.use(urlDecoder: urldecoder)
     
     app.databases.use(DatabaseConfigurationFactory.postgres(configuration: .init(
         hostname: Environment.get("DATABASE_HOST") ?? "localhost",
@@ -51,7 +68,9 @@ public func configure(_ app: Application) async throws {
         database: Environment.get("DATABASE_NAME") ?? "movies_database",
         tls: .disable)
     ), as: .psql)
-
+    
+//    app.logger.logLevel = .debug
+    
     app.routes.defaultMaxBodySize = "10mb"
     
     // Migrations
