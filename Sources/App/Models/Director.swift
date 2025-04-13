@@ -35,6 +35,16 @@ extension MovieDirector {
               profilePath: director.profilePath,
               creditId: creditId,
               department: department,
-              job: job)
+              job: job
+        )
     }
+
+    func toCreditDTO() -> DirectingCreditDTO {
+        .init(
+            id: movie.id ?? 0,
+            title: movie.title,
+            posterPath: movie.posterPath,
+            creditId: creditId
+            )
+        }
 }
