@@ -24,11 +24,11 @@ func routes(_ app: Application) throws {
 
    
 
-    app.get("genres") { req async -> Response in
+    app.get("genres") { req async throws -> Response in
         let genreDTOs = try await Genre.query(on: req.db)
             .all()
             .map(\.toDTO)
-        return jsonOrHTML(request: req, templateName: "genres_list", value: ["genres": genreDTOs])
+        return try await jsonOrHTML(request: req, templateName: "genres_list", value: ["genres": genreDTOs])
 
         let resp = Response(status: .ok)
         if req.headers.accept.contains(where: { $0.mediaType == .html }) {
