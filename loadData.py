@@ -2,9 +2,9 @@ import requests, json
 import zipfile
 
 # load zipfile
-archive = zipfile.ZipFile('tmdb_dump_2025-04-10.zip','r')
+archive = zipfile.ZipFile('movie_dump.zip','r')
 # pull db dump from zip
-dump = archive.open('tmdb_dump_2025-04-10.json')
+dump = archive.open('movie_dump.json')
 # parse json
 parsed = json.load(dump)
 
