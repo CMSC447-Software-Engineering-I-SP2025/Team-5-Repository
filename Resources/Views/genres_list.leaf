@@ -1,13 +1,13 @@
 <!doctype html>
-<html leng="en">
+<html lang="en">
 <head>
     <meta charset="utf-8">
 
-    <title>#(title)</title>
+    <title>Genres</title>
 </head>
 
 <body>
-    <h1>#(message)</h1>
+    <h1>Test!</h1>
 </body>
 
 </html>
