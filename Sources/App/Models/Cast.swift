@@ -39,8 +39,21 @@ extension MovieCast {
               castId: movieCastId,
               character: character,
               creditId: creditId,
-              order: castOrder)
+              order: castOrder
+        )
     }
+    
+    func toCreditDTO() -> ActingCreditDTO {
+        .init(
+            id: movie.id!,
+            title: movie.title,
+            character: character,
+            posterPath: movie.posterPath,
+            creditId: creditId,
+            order: castOrder
+        )
+    }
+
 }
 
 

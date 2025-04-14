@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>#(person.name)</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        img {
+            max-width: 200px;
+            height: auto;
+            border-radius: 8px;
+        }
+        .section {
+            margin-top: 30px;
+        }
+        h1 {
+            margin-bottom: 0;
+        }
+        .credits {
+            margin-top: 10px;
+        }
+        .credit-entry {
+            margin-bottom: 15px;
+            padding-left: 10px;
+            border-left: 3px solid #ccc;
+        }
+    </style>
+</head>
+<body>
+    <h1>#(person.name)</h1>
+    #if(person.profilePath):
+        <img src="https://image.tmdb.org/t/p/w300#(person.profilePath)" alt="#(person.name)">
+    #endif
+
+    <div class="section">
+        <strong>Original Name:</strong> #(person.originalName)<br>
+        <strong>Known For:</strong> #(person.knownForDepartment)<br>
+        <strong>Gender:</strong> #(person.gender)<br>
+        <strong>Adult:</strong> #(person.adult)<br>
+        <strong>Popularity:</strong> #(person.popularity)
+    </div>
+
+    #if(count(person.actingCredits) > 0):
+    <div class="section">
+        <h2>Acting Credits</h2>
+        <div class="credits">
+            #for(credit in person.actingCredits):
+                <div class="credit-entry">
+                    <strong>Title:</strong> #(credit.title)<br>
+                    <strong>Character:</strong> #(credit.character)<br>
+                    <strong>Order:</strong> #(credit.order)<br>
+                    <strong>Credit ID:</strong> #(credit.creditId)<br>
+                    #if(credit.posterPath):
+                        <img src="https://image.tmdb.org/t/p/w200#(credit.posterPath)">
+                    #endif
+                </div>
+            #endfor
+        </div>
+    </div>
+    #endif
+
+    #if(count(person.directingCredits) > 0):
+    <div class="section">
+        <h2>Directing Credits</h2>
+        <div class="credits">
+            #for(credit in person.directingCredits):
+                <div class="credit-entry">
+                    <strong>Title:</strong> #(credit.title)<br>
+                    <strong>Credit ID:</strong> #(credit.creditId)<br>
+                    #if(credit.posterPath):
+                        <img src="https://image.tmdb.org/t/p/w200#(credit.posterPath)">
+                    #endif
+                </div>
+            #endfor
+        </div>
+    </div>
+    #endif
+</body>
+</html>

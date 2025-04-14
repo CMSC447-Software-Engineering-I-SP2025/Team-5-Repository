@@ -10,6 +10,9 @@ struct PersonDTO: Content {
     var originalName: String
     var popularity: Double
     var profilePath: String?
+
+    var actingCredits: [ActingCreditDTO]
+    var directingCredits: [DirectingCreditDTO]
 }
 
 extension Person {
@@ -22,7 +25,9 @@ extension Person {
             name: self.name,
             originalName: self.originalName,
             popularity: self.popularity,
-            profilePath: self.profilePath
+            profilePath: self.profilePath,
+            actingCredits: self.$actedIn.pivots.map { $0.toCreditDTO() },
+            directingCredits: self.$directed.pivots.map { $0.toCreditDTO() }
         )
     }
 }
