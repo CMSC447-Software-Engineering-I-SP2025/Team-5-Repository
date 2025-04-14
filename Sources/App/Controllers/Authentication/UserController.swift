@@ -4,7 +4,8 @@ import Fluent
 struct ProfilePage: LeafPage {
     var file: String { "profile" }
     
-    var meta: PageMetadata {
+    var meta: PageMetadata
+    init(user: User?=nil) {
         let title: String
         let description: String
         if let user = user {
@@ -14,11 +15,10 @@ struct ProfilePage: LeafPage {
             title = "Not Logged In"
             description = "Not Logged In"
         }
-        return .init(title: title, description: description, user: user)
+        meta = .init(title: title, description: description, user: user)
     }
-    
-    var user: User? = nil
 }
+
 struct UserController: RouteCollection, @unchecked Sendable {
     let sessionProtected: RoutesBuilder
     
@@ -29,10 +29,11 @@ struct UserController: RouteCollection, @unchecked Sendable {
     
     @Sendable
     func renderProfilePage(_ req: Request) async throws -> Response {
-        let user = try await req.auth.get(Token.self)?.$user.get(on: req.db)
-
-        return try await ProfilePage(user: user)
-            .render(with: req)
+        if let user = try await req.auth.get(Token.self)?.$user.get(on: req.db) {
+            return try await ProfilePage(user: user)
+                .render(with: req)
+        }
+        return req.redirect(to: "/login")
     }
 
     @Sendable
@@ -42,7 +43,8 @@ struct UserController: RouteCollection, @unchecked Sendable {
         
         var redirect = "/"
         if let referrerString = req.headers["Referer"].first,
-                let referrerURL = URL(string: referrerString) {
+                let referrerURL = URL(string: referrerString),
+                !["/login","/profile","/logout"].contains(referrerURL.path()) {
             redirect = referrerURL.path()
         }
         return req.redirect(to: redirect)

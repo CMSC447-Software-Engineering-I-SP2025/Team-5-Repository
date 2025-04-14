@@ -1,5 +1,5 @@
 #extend("base"):
     #export("body"):
-        <h1>#(message)</h1>
+        <h1>#(meta.description)</h1>
     #endexport
 #endextend

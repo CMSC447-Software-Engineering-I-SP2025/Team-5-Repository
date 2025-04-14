@@ -35,18 +35,24 @@ extension User {
     }
 }
 
-struct RegistrationController: RouteCollection {
+struct RegistrationController: RouteCollection, @unchecked Sendable {
+    let sessionProtected: RoutesBuilder
+
     func boot(routes: any RoutesBuilder) throws {
-        routes.get("register", use: renderRegister)
+        sessionProtected.get("register", use: renderRegister)
         routes.post("register", use: handleRegister)
     }
     
     @Sendable
     func renderRegister(_ req: Request) async throws -> Response {
-        try await Page(file: "register",
+        if let user = try await req.auth.get(Token.self)?.$user.get(on: req.db) {
+            return req.redirect(to: "/")
+        }
+
+        return try await Page(file: "register",
                        meta: .init(title: "Register",
                                    description: "Registration Page"))
-        .render(with: req)
+            .render(with: req)
     }
     
     @Sendable

@@ -1,38 +1,6 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>#(person.name)</title>
-    <style>
-        body {
-            font-family: sans-serif;
-            max-width: 900px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-        img {
-            max-width: 200px;
-            height: auto;
-            border-radius: 8px;
-        }
-        .section {
-            margin-top: 30px;
-        }
-        h1 {
-            margin-bottom: 0;
-        }
-        .credits {
-            margin-top: 10px;
-        }
-        .credit-entry {
-            margin-bottom: 15px;
-            padding-left: 10px;
-            border-left: 3px solid #ccc;
-        }
-    </style>
-</head>
-<body>
-    <h1>#(person.name)</h1>
+#extend("base"):
+    #export("body"):
+        <h1>#(person.name)</h1>
     #if(person.profilePath):
         <img src="https://image.tmdb.org/t/p/w300#(person.profilePath)" alt="#(person.name)">
     #endif
@@ -80,5 +48,5 @@
         </div>
     </div>
     #endif
-</body>
-</html>
+    #endexport
+#endextend

@@ -63,8 +63,11 @@ struct LoginController: RouteCollection, @unchecked Sendable {
         var redirect = try req.query.decode(Redirect.self).redirect
         if redirect == nil {
             if let referrerString = req.headers["Referer"].first,
-               let referrerURL = URL(string: referrerString) {
+               let referrerURL = URL(string: referrerString),
+               !["/login","/register","/logout"].contains(referrerURL.path()) {
                 redirect = referrerURL.path()
+            } else {
+                redirect = "/"
             }
         }
         return try await LoginPage(redirect: redirect).render(with: req)

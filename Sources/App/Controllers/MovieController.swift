@@ -70,7 +70,7 @@ struct MovieController: RouteCollection, @unchecked Sendable {
     
     func boot(routes: RoutesBuilder) throws {
         // API routes
-        let api = sessionProtected.grouped("api/movies")
+        let api = sessionProtected.grouped("api").grouped("movies")
         api.get(use: self.searchAPI)
         api.post(use: self.create)
         api.group(":movieID") { movie in
