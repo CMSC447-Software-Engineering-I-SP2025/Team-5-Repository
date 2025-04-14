@@ -46,7 +46,6 @@ struct MovieSearchResponse: LeafPage {
     var genres: [GenreDTO]
     var languages: [SpokenLanguageDTO]
     var countries: [ProductionCountryDTO]
-    var user: User?
     
     init(query: MovieIndexQuery, pages: Int,
          movies: [ListMovieDTO], genres: [GenreDTO],
@@ -58,7 +57,6 @@ struct MovieSearchResponse: LeafPage {
         self.genres = genres
         self.languages = languages
         self.countries = countries
-        self.user = user
         self.meta = .init(title: "Movies", description: "Outitech Movies", user: user)
     }
     var meta: PageMetadata

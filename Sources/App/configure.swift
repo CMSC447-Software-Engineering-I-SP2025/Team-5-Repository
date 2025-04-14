@@ -9,9 +9,9 @@ public func configure(_ app: Application) async throws {
     // uncomment to serve files from /Public folder
     app.middleware.use(FileMiddleware(publicDirectory: app.directory.publicDirectory))
     
-    // Ensure encoder convers to/from camel/snake cases
+    // Encoders for custom date formatting
+    // Ensure manual conversion to/from camel/snake cases where necessary
     let encoder = JSONEncoder()
-    encoder.keyEncodingStrategy = .convertToSnakeCase
     encoder.dateEncodingStrategy = .custom { date, encoder in
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM-dd"
@@ -24,7 +24,6 @@ public func configure(_ app: Application) async throws {
     }
     
     let decoder = JSONDecoder()
-    decoder.keyDecodingStrategy = .convertFromSnakeCase
     decoder.dateDecodingStrategy = .custom { decoder in
         let container = try decoder.singleValueContainer()
         let dateString = try container.decode(String.self)

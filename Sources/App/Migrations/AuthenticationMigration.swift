@@ -22,7 +22,7 @@ struct AuthenticationMigration: AsyncMigration {
     }
     
     func revert(on database: Database) async throws {
-        try await database.schema(User.schema).delete()
         try await database.schema(Token.schema).delete()
+        try await database.schema(User.schema).delete()
     }
 }

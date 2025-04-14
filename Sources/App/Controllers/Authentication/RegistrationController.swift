@@ -58,13 +58,17 @@ struct RegistrationController: RouteCollection, @unchecked Sendable {
     @Sendable
     func handleRegister(_ req: Request) async throws -> Response {
         let registration = try RegistrationRequest.decode(from: req)
-        
+
         // hash password
         let hash = try await registration.hash(with: req)
         
         // Create user
         let user = User(from: registration, hash: hash)
-        try await user.create(on: req.db)
+        do {
+            try await user.create(on: req.db)
+        } catch {
+            throw AuthenticationError.emailAlreadyExists
+        }
         
         // Redirect to login
         return req.redirect(to: "/login")
