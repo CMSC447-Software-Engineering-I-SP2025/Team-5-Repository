@@ -9,9 +9,9 @@ public func configure(_ app: Application) async throws {
     // uncomment to serve files from /Public folder
     app.middleware.use(FileMiddleware(publicDirectory: app.directory.publicDirectory))
     
-    // Ensure encoder convers to/from camel/snake cases
+    // Encoders for custom date formatting
+    // Ensure manual conversion to/from camel/snake cases where necessary
     let encoder = JSONEncoder()
-    encoder.keyEncodingStrategy = .convertToSnakeCase
     encoder.dateEncodingStrategy = .custom { date, encoder in
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM-dd"
@@ -24,7 +24,6 @@ public func configure(_ app: Application) async throws {
     }
     
     let decoder = JSONDecoder()
-    decoder.keyDecodingStrategy = .convertFromSnakeCase
     decoder.dateDecodingStrategy = .custom { decoder in
         let container = try decoder.singleValueContainer()
         let dateString = try container.decode(String.self)
@@ -60,6 +59,20 @@ public func configure(_ app: Application) async throws {
     }))
     ContentConfiguration.global.use(urlDecoder: urldecoder)
     
+
+    let urlEncoder = URLEncodedFormEncoder(configuration: .init(arrayEncoding: .values,
+                                                                dateEncodingStrategy: .custom { date, encoder in
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd"
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.timeZone = TimeZone(secondsFromGMT: 0)
+        
+        var container = encoder.singleValueContainer()
+        let dateString = formatter.string(from: date)
+        try container.encode(dateString)
+    }))
+    ContentConfiguration.global.use(urlEncoder: urlEncoder)
+    
     app.databases.use(DatabaseConfigurationFactory.postgres(configuration: .init(
         hostname: Environment.get("DATABASE_HOST") ?? "localhost",
         port: Environment.get("DATABASE_PORT").flatMap(Int.init(_:)) ?? SQLPostgresConfiguration.ianaPortNumber,
@@ -75,12 +88,17 @@ public func configure(_ app: Application) async throws {
     
     // Migrations
     app.migrations.add(CreateInitialTables())
+    app.migrations.add(AuthenticationMigration())
+    app.migrations.add(SessionRecord.migration)
 
     app.asyncCommands.use(LoadDataCommand(), as: "import")
     // Views
     
     app.views.use(.leaf)
-    
+    app.leaf.cache.isEnabled = app.environment.isRelease
+
+    app.sessions.use(.fluent)
+
     // register routes
     try routes(app)
 }

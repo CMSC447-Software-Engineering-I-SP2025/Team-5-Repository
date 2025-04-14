@@ -45,11 +45,18 @@ struct AppTests {
             ), as: databaseId)
 
             app.databases.default(to: databaseId)
+            app.logger.logLevel = .critical
             try await app.autoMigrate()
+            app.logger.logLevel = .info
             try await test(app)
-            try await app.autoRevert()   
+            
+            app.logger.logLevel = .critical
+            try await app.autoRevert()
+            app.logger.logLevel = .info
         } catch {
+            app.logger.logLevel = .critical
             try? await app.autoRevert()
+            app.logger.logLevel = .info
             try await app.asyncShutdown()
             let clearDatabaseApp = try await Application.make(.testing)
             try await configure(clearDatabaseApp)
@@ -65,16 +72,7 @@ struct AppTests {
         _ = try await postgres.simpleQuery("DROP DATABASE \(dbName)").get()
         try await clearDatabaseApp.asyncShutdown()
     }
-    
-    @Test("Test Hello World Route")
-    func helloWorld() async throws {
-        try await withApp { app in
-            try await app.testing().test(.GET, "hello", afterResponse: { res async in
-                #expect(res.status == .ok)
-                #expect(res.body.string == "Hello, world!")
-            })
-        }
-    }
+
     
     @Test("Getting all the Movies")
     func getAllMovies() async throws {
@@ -87,11 +85,10 @@ struct AppTests {
             }
             let sampleMovies = try await Movie.query(on: app.db).with(\.$genres).all()
             
-            try await app.testing().test(.GET, "movies",
-                                         headers: ["Accept": "application/json"],
-                                         afterResponse: { res async throws in
+            try await app.testing().test(.GET, "/api/movies", afterResponse: { res async throws in
                 #expect(res.status == .ok)
-                let response = try res.content.decode(MovieIndexResponse.self)
+                
+                let response = try res.content.decode(MovieSearchResponse.self)
                 #expect(response.movies.count == sampleMovies.count)
                 #expect(Set(response.movies.map(\.id)) == Set(sampleMovies.map(\.id)))
             })
@@ -104,7 +101,7 @@ struct AppTests {
                                              from: SampleData.testMovie1.data(using: .utf8)!)
         
         try await withApp { app in
-            try await app.testing().test(.POST, "movies", beforeRequest: { req in
+            try await app.testing().test(.POST, "api/movies", beforeRequest: { req in
                 try req.content.encode(newDTO)
             }, afterResponse: { res async throws in
                 #expect(res.status == .ok)
@@ -127,7 +124,7 @@ struct AppTests {
             let testMovies = try await Movie.query(on: app.db).with(\.$genres).all()
             
             
-            try await app.testing().test(.DELETE, "movies/\(testMovies[0].requireID())", afterResponse: { res async throws in
+            try await app.testing().test(.DELETE, "api/movies/\(testMovies[0].requireID())", afterResponse: { res async throws in
                 #expect(res.status == .noContent)
                 let model = try await Movie.find(testMovies[0].id, on: app.db)
                 #expect(model == nil)
@@ -151,7 +148,7 @@ struct AppTests {
                 .with(\.$directors)
                 .with(\.$directors.$pivots, { $0.with(\.$director) })
                 .all()
-            try await app.testing().test(.GET, "/movies/\(testMovies[0].requireID())") { res in
+            try await app.testing().test(.GET, "api/movies/\(testMovies[0].requireID())") { res in
                 #expect(res.status == .ok)
                 let dto = try res.content.decode(MovieDTO.self)
                 
@@ -162,6 +159,41 @@ struct AppTests {
                 #expect(Set(dto.genres.map(\.id)) == Set(testMovies[0].genres.map(\.id)))
                 #expect(Set(dto.cast.map(\.id)) == Set(testMovies[0].cast.map(\.id)))
                 #expect(Set(dto.directors.map(\.id)) == Set(testMovies[0].directors.map(\.id)))
+            }
+        }
+    }
+    
+    @Test("Person Detail")
+    func personDetail() async throws {
+        try await withApp { app in
+            let sampleData = [SampleData.testMovie1, SampleData.testMovie2]
+            let _ = try await sampleData.asyncMap {
+                let data = try Self.decoder.decode(MovieDTO.self,
+                                                   from: $0.data(using: .utf8)!)
+                return try await Movie.createOrUpdate(on: app.db, from: data)
+            }
+            let testPeople = try await Person.query(on: app.db)
+                .with(\.$actedIn)
+                .with(\.$actedIn.$pivots) { pivot in pivot.with(\.$movie) }
+                .with(\.$directed)
+                .with(\.$directed.$pivots) { pivot in pivot.with(\.$movie) }
+                .all()
+            
+            try await app.testing().test(.GET, "api/people/\(testPeople[0].requireID())") { res in
+                #expect(res.status == .ok)
+                let dto = try res.content.decode(PersonDTO.self)
+
+                #expect(dto.id == testPeople[0].id)
+                #expect(dto.adult == testPeople[0].adult)
+                #expect(dto.gender == testPeople[0].gender)
+                #expect(dto.knownForDepartment == testPeople[0].knownForDepartment)
+                #expect(dto.name == testPeople[0].name)
+                #expect(dto.originalName == testPeople[0].originalName)
+                #expect(dto.popularity == testPeople[0].popularity)
+                
+                #expect(dto.actingCredits.map(\.creditId).sorted() == testPeople[0].personDTO.actingCredits.map(\.creditId).sorted())
+                #expect(dto.directingCredits.map(\.creditId).sorted() == testPeople[0].personDTO.directingCredits.map(\.creditId).sorted())
+
             }
         }
     }

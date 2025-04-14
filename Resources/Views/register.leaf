@@ -1,0 +1,42 @@
+#extend("base"):
+    #export("body"):
+        <br />
+        <div class="row justify-content-center">
+          <div class="col-md-6">
+            <div class="card">
+              <div class="card-body">
+                <h3 class="card-title">Register</h3>
+                <form action="/register" method="POST">
+                  #if(meta.error):
+                  <div class="form-group">
+                  <em>#(meta.error)</em>
+                  </div>
+                  #endif
+
+                  <div class="form-group">
+                    <label for="email">Name</label>
+                    <input type="name" name="name" class="form-control" id="name" />
+                  </div>
+                  <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" name="email" class="form-control" id="email" />
+                  </div>
+                  <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" name="password" class="form-control" id="password" />
+                  </div>
+                  <div class="form-group">
+                    <label for="password">Confirm Password</label>
+                    <input type="password" name="confirm" class="form-control" id="confirm" />
+                  </div>
+                  <div class="form-group">
+                    <input type="submit" class="btn btn-block btn-primary" value="register" />
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+    #endexport
+#endextend
+

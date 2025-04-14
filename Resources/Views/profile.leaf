@@ -1,0 +1,25 @@
+#extend("base"):
+    #export("body"):
+        <div class="row justify-content-center">
+          <div class="col-md-6">
+            <div class="card">
+              <div class="card-body">
+                <h3 class="card-title">#(meta.title)</h3>
+
+                <h4>User #(meta.user.name)</h4>
+                <li>Name: #(meta.user.name) </li>
+                <li>Email: #(meta.user.email)</li>
+
+                <br />
+
+                <h4>Actions</h4>
+                <div><a href="/register">Register</a></div>
+                <div><a href="/login">Login</a></div>
+                <div><a href="/logout">Logout</a></div>
+                </div>
+            </div>
+          </div>
+        </div>
+    #endexport
+#endextend
+
