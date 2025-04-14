@@ -5,57 +5,40 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
     <title>#(meta.title)</title>
+    <link rel="stylesheet" href="/styles/person_detail.css">
+    <link rel="stylesheet" href="/styles/movie_list.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <meta name="description" content="#(meta.description)">
   </head>
-  <body class="container">
-  <nav class="navbar navbar-expand-lg navbar-light bg-light">
-      <div class="container-fluid">
-        <!-- Title on the left -->
-        <a class="navbar-brand" href="/">#(meta.title)</a>
-        
-        <!-- Navbar toggler for responsiveness -->
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
-          data-bs-target="#navbarContent" aria-controls="navbarContent" aria-expanded="false"
-          aria-label="Toggle navigation">
-          <span class="navbar-toggler-icon"></span>
-        </button>
-        
-        <div class="collapse navbar-collapse" id="navbarContent">
-          <!-- Left side links: Movies & People -->
-          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-            <li class="nav-item">
-              <a class="nav-link" href="/movies">Movies</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="/people">People</a>
-            </li>
-          </ul>
-          
-          <!-- Right side: User options with added right padding -->
-          <ul class="navbar-nav ms-auto mb-2 mb-lg-0 pe-3">
-            #if(meta.user):
-              <!-- User is logged in: display profile link and logout -->
-              <li class="nav-item">
-                <a class="nav-link" href="/profile">#(meta.user.name)</a>
-              </li>
-              <li class="nav-item">
-                <form class="d-inline" method="GET" action="/logout">
-                  <button type="submit" class="btn btn-outline-danger">Logout</button>
-                </form>
-              </li>
-            #else:
-              <!-- No user: display login and create account buttons -->
-              <li class="nav-item">
-                <a class="nav-link" href="/login">Login</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="/register">Create Account</a>
-              </li>
-            #endif
-          </ul>
-        </div>
-      </div>
-    </nav>
+  <script>
+      document.addEventListener('DOMContentLoaded', function () {
+          const toggler = document.getElementById('navbar-toggler');
+          const content = document.getElementById('navbar-content');
+
+          if (toggler && content) {
+            toggler.addEventListener('click', function () {
+                content.classList.toggle('hidden');
+            });
+          }
+
+          // More details buttons functionality
+          const detailsButtons = document.querySelectorAll('[id^="more-details-button-"]');
+
+          detailsButtons.forEach(function(button) {
+              button.addEventListener('click', function() {
+                  const creditId = button.id.replace('more-details-button-', '');
+                  const detailsDiv = document.getElementById('more-details-' + creditId);
+
+                  if (detailsDiv) {
+                      detailsDiv.classList.toggle('hidden');
+                  }
+              });
+          });
+      });
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <body class="bg-gray-100 font-sans leading-normal tracking-normal">
+    #extend("Components/_navbar")
     <main>
         #import("body")
     </main>

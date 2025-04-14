@@ -1,0 +1,52 @@
+<div id="person-detail" class="bg-white max-w-3/4 mx-auto rounded-2xl shadow-md overflow-hidden relative">
+    <div class="md:flex items-stretch">
+        #if(movie.poster_path):
+            <div class="md:w-1/3 relative">
+                <img class="w-full h-full object-cover rounded-tl-2xl rounded-bl-2xl" src="https://image.tmdb.org/t/p/w500#(movie.poster_path)" alt="#(movie.title) Poster">
+                <div class="absolute top-0 left-0 w-full h-full bg-gradient-to-t from-black to-transparent opacity-30"></div>
+            </div>
+        #endif
+
+        <div class="md:w-2/3 p-6 relative">
+            <h1 class="text-3xl font-semibold text-gray-800 mb-2 relative">#(movie.title)</h1>
+            #if(movie.tagline):
+                <p class="lead text-gray-600 italic mb-4">#(movie.tagline)</p>
+            #endif
+              <hr class="mb-4 border-gray-300">
+            <div class="mb-4">
+                <p class="flex items-center text-gray-700 text-sm">
+                    <i class="fa fa-calendar mr-2 text-gray-500"></i>
+                    <strong class="mr-1">Release Date:</strong> #(movie.release_date)
+                </p>
+                <p class="flex items-center text-gray-700 text-sm">
+                    <i class="fa fa-clock-o mr-2 text-gray-500"></i>
+                    <strong class="mr-1">Runtime:</strong> #(movie.runtime) minutes
+                </p>
+                <p class="flex items-center text-gray-700 text-sm">
+                    <i class="fa fa-info-circle mr-2 text-gray-500"></i>
+                    <strong class="mr-1">Status:</strong> #(movie.status)
+                </p>
+                <p class="flex items-center text-gray-700 text-sm">
+                    <i class="fa fa-star mr-2 text-yellow-500"></i>
+                    <strong class="mr-1">Rating:</strong> #(movie.vote_average) / 10 (based on #(movie.vote_count) votes)
+                </p>
+                <p class="flex items-center text-gray-700 text-sm">
+                    <i class="fa fa-money mr-2 text-green-500"></i>
+                    <strong class="mr-1">Budget:</strong> $#(movie.budget)
+                    <span class="ml-4"><i class="fa fa-line-chart mr-2 text-green-500"></i>
+                    <strong class="mr-1">Revenue:</strong> $#(movie.revenue)</span>
+                </p>
+            </div>
+
+            <p class="text-gray-700 leading-relaxed mb-4 text-sm">#(movie.overview)</p>
+
+            #if(movie.homepage):
+                <a href="#(movie.homepage)" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition duration-300 text-sm">
+                    Visit Homepage
+                </a>
+            #endif
+
+            <div class="absolute top-0 left-0 w-full h-full bg-gray-100 opacity-10 rounded-2xl"></div>
+        </div>
+    </div>
+</div>

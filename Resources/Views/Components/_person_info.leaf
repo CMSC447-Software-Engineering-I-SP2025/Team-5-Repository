@@ -1,0 +1,42 @@
+<div id="person-detail" class="bg-white max-w-3/4 mx-auto rounded-2xl shadow-md overflow-hidden relative">
+    <div class="md:flex items-center">
+        #if(person.profilePath):
+            <div class="md:w-1/3 relative">
+                <img class="w-full h-full object-cover rounded-tl-2xl rounded-bl-2xl" src="https://image.tmdb.org/t/p/w500#(person.profilePath)" alt="#(person.name)">
+                <div class="absolute top-0 left-0 w-full h-full bg-gradient-to-t from-black to-transparent opacity-30"></div>
+            </div>
+        #endif
+
+        <div class="md:w-2/3 p-3 relative">
+            <h2 class="text-5xl font-bold text-gray-800 mb-4 relative">Personal Details</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 relative">
+                <div class="flex items-center p-2 rounded-md hover:bg-zinc-300 transition-colors duration-200">
+                    <i class="fa fa-lg fa-user text-blue-500 mr-2"></i>
+                    <strong class="text-gray-700 text-lg font-semibold">Original Name:</strong>
+                    <span class="text-gray-600 text-base">#(person.originalName)</span>
+                </div>
+                <div class="flex items-center p-2 rounded-md hover:bg-zinc-300 transition-colors duration-200">
+                    <i class="fa fa-lg fa-film text-green-500 mr-2"></i>
+                    <strong class="text-gray-700 text-lg font-semibold">Known For:</strong>
+                    <span class="text-gray-600 text-base ml-1">#(person.knownForDepartment)</span>
+                </div>
+                <div class="flex items-center p-2 rounded-md hover:bg-zinc-300 transition-colors duration-200">
+                    <i class="fa fa-lg fa-venus-mars text-purple-500 mr-2"></i>
+                    <strong class="text-gray-700 text-lg font-semibold">Gender:</strong>
+                    <span class="text-gray-600 text-base ml-1">#(person.gender)</span>
+                </div>
+                <div class="flex items-center p-2 rounded-md hover:bg-zinc-300 transition-colors duration-200">
+                    <i class="fa fa-lg fa-check-square text-yellow-500 mr-2"></i>
+                    <strong class="text-gray-700 text-lg font-semibold">Adult:</strong>
+                    <span class="text-gray-600 text-base ml-1">#(person.adult)</span>
+                </div>
+                <div class="flex items-center p-2 rounded-md hover:bg-zinc-300 transition-colors duration-200">
+                    <i class="fa fa-lg fa-star text-red-500 mr-2"></i>
+                    <strong class="text-gray-700 text-lg font-semibold">Popularity:</strong>
+                    <span class="text-gray-600 text-base ml-1">#(person.popularity)</span>
+                </div>
+            </div>
+            <div class="absolute top-0 left-0 w-full h-full bg-gray-100 opacity-10 rounded-2xl"></div>
+        </div>
+    </div>
+</div>
