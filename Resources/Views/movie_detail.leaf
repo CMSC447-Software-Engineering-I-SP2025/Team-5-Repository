@@ -1,0 +1,123 @@
+#extend("base"):
+    #export("body"):
+        <div class="container my-4">
+            <!-- Movie Hero Section -->
+            <div class="row">
+                <div class="col-md-4">
+                    <img src="https://image.tmdb.org/t/p/w500#(movie.poster_path)" class="img-fluid rounded" alt="#(movie.title) Poster">
+                </div>
+                <div class="col-md-8">
+                    <h1>#(movie.title)</h1>
+                    #if(movie.tagline):
+                    <p class="lead text-muted">#(movie.tagline)</p>
+                    #endif
+                    <p>
+                    <strong>Release Date:</strong> #(movie.release_date)<br>
+                    <strong>Runtime:</strong> #(movie.runtime) minutes<br>
+                    <strong>Status:</strong> #(movie.status)
+                    </p>
+                    <p>
+                    <strong>Rating:</strong> #(movie.vote_average) / 10 (based on #(movie.vote_count) votes)
+                    </p>
+                    <p>
+                    <strong>Budget:</strong> $#(movie.budget) &nbsp;&nbsp;
+                    <strong>Revenue:</strong> $#(movie.revenue)
+                    </p>
+                    <p>#(movie.overview)</p>
+                    #if(movie.homepage):
+                    <a href="#(movie.homepage)" class="btn btn-primary">Visit Homepage</a>
+                    #endif
+                </div>
+            </div>
+            
+            <hr class="my-4">
+            
+            <!-- Genres -->
+            <div class="row mb-3">
+                <div class="col">
+                    <h3>Genres</h3>
+                    #if(count(movie.genres) > 0):
+                    <ul class="list-inline">
+                        #for(genre in movie.genres):
+                        <li class="list-inline-item badge bg-secondary">#(genre.name)</li>
+                        #endfor
+                    </ul>
+                    #else:
+                    <p>No genres available.</p>
+                    #endif
+                </div>
+            </div>
+            
+            <!-- Production Companies -->
+            <div class="row mb-4">
+                <div class="col">
+                    <h3>Production Companies</h3>
+                    #if(count(movie.production_companies) > 0):
+                    <div class="d-flex flex-wrap">
+                        #for(company in movie.production_companies):
+                        <div class="p-2 text-center">
+                            #if(company.logo_path):
+                            <img src="https://image.tmdb.org/t/p/w200#(company.logo_path)" class="img-fluid mb-1" alt="#(company.name) Logo">
+                                #else:
+                                <div class="mb-1">No logo</div>
+                                #endif
+                                <p class="small">#(company.name)</p>
+                        </div>
+                        #endfor
+                    </div>
+                    #else:
+                    <p>No production companies available.</p>
+                    #endif
+                </div>
+            </div>
+            
+            <!-- Cast -->
+            <div class="row mb-4">
+                <div class="col">
+                    <h3>Cast</h3>
+                    #if(count(movie.cast) > 0):
+                    <div class="row">
+                        #for(actor in movie.cast):
+                        <div class="col-6 col-md-3 mb-3">
+                            <a href="/people/#(actor.id)" class="text-decoration-none text-reset">
+                                <div class="card h-100">
+                                    #if(actor.profile_path):
+                                    <img src="https://image.tmdb.org/t/p/w200#(actor.profile_path)" class="card-img-top" alt="#(actor.name)">
+                                        #else:
+                                        <img src="/images/default-profile.jpg" class="card-img-top" alt="#(actor.name)">
+                                            #endif
+                                            <div class="card-body p-2">
+                                                <h6 class="card-title mb-1">#(actor.name)</h6>
+                                                <p class="card-text small">as #(actor.character)</p>
+                                            </div>
+                                        </div>
+                            </a>
+                        </div>
+                        #endfor
+                    </div>
+                    #else:
+                    <p>No cast information available.</p>
+                    #endif
+                </div>
+            </div>
+            
+            <!-- Directors -->
+            <div class="row mb-4">
+                <div class="col">
+                    <h3>Directors</h3>
+                    #if(count(movie.directors) > 0):
+                    <ul class="list-group list-group-horizontal">
+                        #for(director in movie.directors):
+                        <li class="list-group-item">
+                            <a href="/people/#(director.id)" class="text-decoration-none">#(director.original_name)</a>
+                        </li>
+                        #endfor
+                    </ul>
+                    #else:
+                    <p>No director information available.</p>
+                    #endif
+                </div>
+            </div>
+        </div>
+    #endexport
+#endextend

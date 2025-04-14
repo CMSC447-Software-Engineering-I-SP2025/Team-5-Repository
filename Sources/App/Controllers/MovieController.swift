@@ -63,6 +63,16 @@ struct MovieSearchResponse: LeafPage {
     var file: String { "movies_index" }
 }
 
+struct MovieDetailPage: LeafPage {
+    var file: String { "movie_detail" }
+    var meta: PageMetadata
+    var movie: MovieDTO
+    init(movie: MovieDTO, user: User?=nil) {
+        self.movie = movie
+        self.meta = .init(title: movie.title, description: movie.overview, user: user)
+    }
+}
+
 struct MovieController: RouteCollection, @unchecked Sendable {
     let sessionProtected: RoutesBuilder
     
@@ -79,7 +89,7 @@ struct MovieController: RouteCollection, @unchecked Sendable {
         // View routes
         let movies = sessionProtected.grouped("movies")
         movies.get(use: self.searchView)
-        movies.get(":movieID", use: self.detail)
+        movies.get(":movieID", use: self.detailView)
     }
     
     @Sendable
@@ -177,6 +187,13 @@ struct MovieController: RouteCollection, @unchecked Sendable {
             throw Abort(.notFound)
         }
         return movie.toDTO()
+    }
+    
+    @Sendable
+    func detailView(req: Request) async throws -> View {
+        try await MovieDetailPage(movie: try await detail(req: req),
+                                  user: try await req.auth.get(Token.self)?.$user.get(on: req.db))
+            .render(with: req)
     }
     
     
