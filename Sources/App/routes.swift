@@ -2,12 +2,20 @@ import Fluent
 import Vapor
 
 func routes(_ app: Application) throws {
-    app.get { req async throws in
-        try await req.view.render("index", ["title": "Hello Vapor!", "message": "Testing!"])
-    }
-
-    app.get("hello") { req async -> String in
-        "Hello, world!"
+    
+    let sessionEnabled = app.grouped(
+        SessionsMiddleware(session: app.sessions.driver)
+    )
+    
+    let sessionProtected = app.grouped(
+        SessionsMiddleware(session: app.sessions.driver),
+        Token.sessionAuthenticator()
+        //            UserToken.guardMiddleware()
+    )
+    
+    sessionProtected.get { req async throws in
+        
+        return try await req.view.render("index", ["title": "Hello Vapor!", "message": "Testing!"])
     }
 
 app.get("people", ":personID") { req async throws -> Response in
@@ -39,5 +47,8 @@ app.get("people", ":personID") { req async throws -> Response in
 
 
 
-    try app.register(collection: MovieController())
+    try app.register(collection: MovieController(sessionProtected: sessionProtected))
+    try app.register(collection: LoginController(sessionEnabled: sessionEnabled))
+    try app.register(collection: UserController(sessionProtected: sessionProtected))
+    try app.register(collection: RegistrationController())
 }

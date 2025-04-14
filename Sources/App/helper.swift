@@ -8,14 +8,11 @@ import Vapor
 /// - Throws: Renderer or Encoding errors
 /// - Returns: Appropriate Accept type response
 func jsonOrHTML<T: Content>(request: Request, templateName: String, value: T) async throws -> Response {
-    var response = Response(status: .ok)
     if request.headers.accept.contains(where: { $0.mediaType == .html }) {
-        let view: View = try await request.view.render(templateName, value)
-        response.headers.contentType = .html
-        response.body = .init(buffer: view.data)
+        return try await request.view
+            .render(templateName, value)
+            .encodeResponse(for: request)
     } else {
-        try response.content.encode(value)
-        response.headers.contentType = .json
+        return try await value.encodeResponse(for: request)
     }
-    return response
 }

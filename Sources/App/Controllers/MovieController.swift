@@ -37,37 +37,62 @@ struct MovieIndexQuery: Content {
     }
 }
 
-struct MovieIndexResponse: Content {
+
+
+struct MovieSearchResponse: LeafPage {
     var query: MovieIndexQuery
     var pages: Int
     var movies: [ListMovieDTO]
     var genres: [GenreDTO]
     var languages: [SpokenLanguageDTO]
     var countries: [ProductionCountryDTO]
+    var user: User?
+    
+    init(query: MovieIndexQuery, pages: Int,
+         movies: [ListMovieDTO], genres: [GenreDTO],
+         languages: [SpokenLanguageDTO], countries: [ProductionCountryDTO],
+         user: User?=nil) {
+        self.query = query
+        self.pages = pages
+        self.movies = movies
+        self.genres = genres
+        self.languages = languages
+        self.countries = countries
+        self.user = user
+        self.meta = .init(title: "Movies", description: "Outitech Movies", user: user)
+    }
+    var meta: PageMetadata
+    var file: String { "movies_index" }
 }
 
-struct MovieController: RouteCollection {
+struct MovieController: RouteCollection, @unchecked Sendable {
+    let sessionProtected: RoutesBuilder
+    
     func boot(routes: RoutesBuilder) throws {
-        let movies = routes.grouped("movies")
-        
-        movies.get(use: self.index)
-        
-        movies.post(use: self.create)
-        movies.group(":movieID") { movie in
+        // API routes
+        let api = sessionProtected.grouped("api/movies")
+        api.get(use: self.searchAPI)
+        api.post(use: self.create)
+        api.group(":movieID") { movie in
             movie.delete(use: self.delete)
             movie.get(use: self.detail)
         }
+
+        // View routes
+        let movies = sessionProtected.grouped("movies")
+        movies.get(use: self.searchView)
+        movies.get(":movieID", use: self.detail)
     }
     
     @Sendable
-    func index(req: Request) async throws -> Response {
+    func searchAPI(req: Request) async throws -> MovieSearchResponse {
         let query = try req.query.decode(MovieIndexQuery.self)
         let page = query.page ?? 1
         let perPage = query.perPage ?? 36
         
         // build query
         var dbQuery = Movie.query(on: req.db)
-
+        
         // add date filters
         if let startDate = query.startDate {
             dbQuery = dbQuery.filter(\Movie.$releaseDate >= startDate)
@@ -108,28 +133,31 @@ struct MovieController: RouteCollection {
         dbQuery = dbQuery
             .sort(\.$popularity, .descending)
             .with(\.$genres)
-                        
+        
         // Paginate movies
         let movies = try await dbQuery.page(withIndex: page, size: perPage)
-
+        
         // Fetch all Genres, Languages, and Production Countries (for filter view)
         let genres = try await Genre.query(on: req.db).sort(\.$name).all().compactMap(\.toDTO)
         let languages = try await SpokenLanguage.query(on: req.db).sort(\.$englishName).all().compactMap((\.toDTO))
         let countries = try await ProductionCountry.query(on: req.db).sort(\.$name).all().compactMap(\.toDTO)
         
         
-        // Build response
-        let pageInfo = MovieIndexResponse(query: query,
-                                          pages: movies.metadata.pageCount,
-                                          movies: movies.items.compactMap({ $0.toListDTO() }),
-                                          genres: genres,
-                                          languages: languages,
-                                          countries: countries)
+        // Final Response
+        let user = try await req.auth.get(Token.self)?.$user.get(on: req.db)
+        return MovieSearchResponse(query: query,
+                                   pages: movies.metadata.pageCount,
+                                   movies: movies.items.compactMap({ $0.toListDTO() }),
+                                   genres: genres,
+                                   languages: languages,
+                                   countries: countries,
+                                   user: user)
         
-        // Render JSON or HTML
-        return try await jsonOrHTML(request: req,
-                                    templateName: "movies_index",
-                                    value: pageInfo)
+    }
+    
+    @Sendable
+    func searchView(req: Request) async throws -> View {
+        try await searchAPI(req: req).render(with: req)
     }
     
     @Sendable

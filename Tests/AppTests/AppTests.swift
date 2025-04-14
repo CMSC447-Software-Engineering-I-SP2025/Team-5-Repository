@@ -91,7 +91,7 @@ struct AppTests {
                                          headers: ["Accept": "application/json"],
                                          afterResponse: { res async throws in
                 #expect(res.status == .ok)
-                let response = try res.content.decode(MovieIndexResponse.self)
+                let response = try res.content.decode(MovieSearchResponse.self)
                 #expect(response.movies.count == sampleMovies.count)
                 #expect(Set(response.movies.map(\.id)) == Set(sampleMovies.map(\.id)))
             })
