@@ -1,13 +1,10 @@
-<!doctype html>
-<html lang="en">
-<head>
-    <meta charset="utf-8">
-
-    <title>Genres</title>
-</head>
-
-<body>
-    <h1>Test!</h1>
-</body>
-
-</html>
+#extend("base"):
+    #export("body"):
+        <h1>Genres</h1>
+            #for(genre in genres):
+            <div class="row">
+                <h4>#(genre.name)</h4>
+            </div>
+            #endfor
+    #endexport
+#endextend

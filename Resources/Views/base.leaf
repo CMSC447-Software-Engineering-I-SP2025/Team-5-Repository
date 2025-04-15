@@ -29,6 +29,9 @@
             <li class="nav-item">
               <a class="nav-link" href="/people">People</a>
             </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/genres">Genres</a>
+            </li>
           </ul>
           
           <!-- Right side: User options with added right padding -->
