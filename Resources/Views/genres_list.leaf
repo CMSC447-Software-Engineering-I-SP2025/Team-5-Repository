@@ -2,9 +2,7 @@
     #export("body"):
         <h1>Genres</h1>
             #for(genre in genres):
-            <div class="row">
-                <h4>#(genre.name)</h4>
-            </div>
+                <a class="nav-link" href="/genres/#(genre.name)">#(genre.name)</a>
             #endfor
     #endexport
 #endextend
