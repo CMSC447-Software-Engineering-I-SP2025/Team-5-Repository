@@ -45,14 +45,3 @@
         </div>
     </div>
 </nav>
-
-<script>
-    const navbarToggler = document.getElementById('navbar-toggler');
-    const navbarContent = document.getElementById('navbar-content');
-
-    if (navbarToggler && navbarContent) {
-        navbarToggler.addEventListener('click', () => {
-            navbarContent.classList.toggle('hidden');
-        });
-    }
-</script>

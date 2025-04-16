@@ -36,6 +36,16 @@
       });
   </script>
   <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <script>
+    const navbarToggler = document.getElementById('navbar-toggler');
+    const navbarContent = document.getElementById('navbar-content');
+
+    if (navbarToggler && navbarContent) {
+        navbarToggler.addEventListener('click', () => {
+            navbarContent.classList.toggle('hidden');
+        });
+    }
+</script>
   <body class="bg-gray-100 font-sans leading-normal tracking-normal">
     #extend("Components/_navbar")
     <main>
