@@ -43,3 +43,12 @@ extension User: ModelAuthenticatable {
         try Bcrypt.verify(password, created: self.passwordHash)
     }
 }
+
+// Favorites
+extension User {
+    func favoriteMovieIds(on db: Database) async throws -> [Int] {
+        try await UserMovieFavorite.query(on: db)
+            .filter(\.$user.$id == requireID())
+            .all(\.$movie.$id)
+    }
+}

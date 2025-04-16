@@ -53,8 +53,8 @@
                     onclick="toggleFavorite(event, #(movie.id))"
                     #if(!meta.user): data-requires-auth="true" #endif
                 >
-                    <i class="fa #if(movie.isFavorited): fa-heart #else: fa-heart-o #endif"></i>
-                    <span>#if(movie.isFavorited): Remove from Favorites #else: Add to Favorites #endif</span>
+                    <i class="fa #if(contains(favoriteMovieIds, movie.id)): fa-heart #else: fa-heart-o #endif"></i>
+                    <span>#if(contains(favoriteMovieIds, movie.id)): Remove from Favorites #else: Add to Favorites #endif</span>
                 </button>
             </div>
 

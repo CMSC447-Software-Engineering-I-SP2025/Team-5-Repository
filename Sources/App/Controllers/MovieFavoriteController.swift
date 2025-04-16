@@ -1,7 +1,7 @@
 import Vapor
 import Fluent
 
-struct MovieFavoriteController: RouteCollection {
+struct MovieFavoriteController: RouteCollection, @unchecked Sendable {
     let sessionProtected: RoutesBuilder
     
     init(sessionProtected: RoutesBuilder) {
@@ -12,7 +12,8 @@ struct MovieFavoriteController: RouteCollection {
         sessionProtected.post("api", "movies", ":movieID", "favorite", use: toggleFavorite)
     }
     
-    func toggleFavorite(req: Request) async throws -> Response {
+    @Sendable
+    func toggleFavorite(req: Request) async throws -> [String: Bool] {
         guard let user = try await req.auth.get(Token.self)?.$user.get(on: req.db) else {
             throw Abort(.unauthorized)
         }
@@ -25,26 +26,16 @@ struct MovieFavoriteController: RouteCollection {
         guard let movie = try await Movie.find(movieID, on: req.db) else {
             throw Abort(.notFound, reason: "Movie not found")
         }
-        
-        // Check if the user has already favorited this movie
-        let existingFavorite = try await UserMovieFavorite.query(on: req.db)
-            .filter(\.$user.$id == user.requireID())
-            .filter(\.$movie.$id == movieID)
-            .first()
-        
-        if let favorite = existingFavorite {
-            // If favorite exists, remove it
-            try await favorite.delete(on: req.db)
-            return Response(status: .ok, body: .init(string: """
-                {"isFavorited": false}
-                """))
+        // load favorite movies
+        _ = try await user.$favoriteMovies.get(on: req.db)
+
+        var retVal = false
+        if user.favoriteMovies.contains(where: { $0.id == movieID }) {
+            try await user.$favoriteMovies.detach(movie, on: req.db)
         } else {
-            // If favorite doesn't exist, create it
-            let favorite = UserMovieFavorite(userID: try user.requireID(), movieID: movieID)
-            try await favorite.save(on: req.db)
-            return Response(status: .ok, body: .init(string: """
-                {"isFavorited": true}
-                """))
+            try await user.$favoriteMovies.attach(movie, on: req.db)
+            retVal = true
         }
+        return ["isFavorited": retVal]
     }
 } 

@@ -129,7 +129,7 @@ final class Movie: Model, @unchecked Sendable {
 
 
 extension Movie {
-    func toDTO(isFavorited: Bool? = nil) -> MovieDTO {
+    var toDTO: MovieDTO {
         .init(adult: adult,
               backdropPath: backdropPath,
               belongsToCollection: belongsToCollection?.toDTO,
@@ -157,11 +157,10 @@ extension Movie {
               voteAverage: voteAverage,
               voteCount: voteCount,
               cast: $cast.pivots.map(\.toDTO),
-              directors: $directors.pivots.map(\.toDTO),
-              isFavorited: isFavorited)
+              directors: $directors.pivots.map(\.toDTO))
     }
     
-    func toListDTO(isFavorited: Bool? = nil) -> ListMovieDTO {
+    var toListDTO: ListMovieDTO {
         .init(adult: adult,
               backdropPath: backdropPath,
               budget: budget,
@@ -182,8 +181,7 @@ extension Movie {
               title: title,
               video: video,
               voteAverage: voteAverage,
-              voteCount: voteCount,
-              isFavorited: isFavorited)
+              voteCount: voteCount)
     }
 }
 

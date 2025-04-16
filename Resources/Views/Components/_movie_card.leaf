@@ -15,7 +15,7 @@
                             onclick="toggleFavorite(event, #(movie.id))"
                             #if(!meta.user): data-requires-auth="true" #endif
                             >
-                            <i class="fa #if(movie.isFavorited): fa-heart text-red-500 #else: fa-heart-o #endif"></i>
+                            <i class="fa #if(contains(favoriteMovieIds, movie.id)): fa-heart text-red-500 #else: fa-heart-o #endif"></i>
                         </button>
                     </div>
                     <div class="movie-year">#date(movie.release_date, "YYYY-MM-dd")</div>

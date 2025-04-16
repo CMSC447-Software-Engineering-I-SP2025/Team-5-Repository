@@ -90,6 +90,7 @@ public func configure(_ app: Application) async throws {
     app.migrations.add(CreateInitialTables())
     app.migrations.add(AuthenticationMigration())
     app.migrations.add(SessionRecord.migration)
+    app.migrations.add(CreateUserMovieFavorite())
 
     app.asyncCommands.use(LoadDataCommand(), as: "import")
     // Views

@@ -22,26 +22,6 @@ func routes(_ app: Application) throws {
         return try await page.render(with: req)
     }
 
-   
-
-    app.get("genres") { req async throws -> Response in
-        let genreDTOs = try await Genre.query(on: req.db)
-            .all()
-            .map(\.toDTO)
-        return try await jsonOrHTML(request: req, templateName: "genres_list", value: ["genres": genreDTOs])
-
-        let resp = Response(status: .ok)
-        if req.headers.accept.contains(where: { $0.mediaType == .html }) {
-            let view: View = try await req.view.render("genres", genreDTOs)
-            resp.headers.contentType = .html
-            resp.body = .init(buffer: view.data)
-        } else {
-            try resp.content.encode(genreDTOs)
-            resp.headers.contentType = .json
-        }
-        return resp
-    }
-
     // Auth controllers
     try app.register(collection: LoginController(sessionEnabled: sessionEnabled))
     try app.register(collection: UserController(sessionProtected: sessionProtected))
