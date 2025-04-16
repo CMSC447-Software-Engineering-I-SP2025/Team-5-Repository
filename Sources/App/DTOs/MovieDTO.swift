@@ -30,6 +30,7 @@ struct MovieDTO: Content {
     var voteCount: Int
     var cast: [CastDTO]
     var directors: [DirectorDTO]
+    var isFavorited: Bool?
     
     enum CodingKeys: String, CodingKey {
         case adult
@@ -60,6 +61,7 @@ struct MovieDTO: Content {
         case voteCount = "vote_count"
         case cast
         case directors
+        case isFavorited
     }
 }
 
@@ -86,6 +88,7 @@ struct ListMovieDTO: Content {
     var video: Bool
     var voteAverage: Double
     var voteCount: Int
+    var isFavorited: Bool?
 
     enum CodingKeys: String, CodingKey {
         case adult
@@ -109,6 +112,7 @@ struct ListMovieDTO: Content {
         case video
         case voteAverage = "vote_average"
         case voteCount = "vote_count"
+        case isFavorited
     }
 }
 

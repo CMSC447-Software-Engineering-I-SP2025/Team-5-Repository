@@ -1,0 +1,24 @@
+<div class="mb-6">
+    <h3 class="text-xl font-semibold text-gray-800 mb-3">Cast</h3>
+    #if(count(movie.cast) > 0):
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            #for(actor in movie.cast):
+                <a href="/people/#(actor.id)" class="text-decoration-none text-reset">
+                    <div class="bg-white rounded-lg shadow-md overflow-hidden h-full flex flex-col justify-between">
+                        #if(actor.profile_path):
+                            <img src="https://image.tmdb.org/t/p/w200#(actor.profile_path)" class="w-full object-cover h-40" alt="#(actor.name)">
+                        #else:
+                            <img src="/images/default-profile.jpg" class="w-full object-cover h-40" alt="#(actor.name)">
+                        #endif
+                        <div class="p-3">
+                            <h6 class="text-sm font-semibold text-gray-800 mb-1">#(actor.name)</h6>
+                            <p class="text-gray-600 text-xs">as #(actor.character)</p>
+                        </div>
+                    </div>
+                </a>
+            #endfor
+        </div>
+    #else:
+        <p class="text-gray-600">No cast information available.</p>
+    #endif
+</div>

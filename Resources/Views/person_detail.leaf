@@ -1,80 +1,17 @@
 #extend("base"):
 #export("body"):
 <div class="container my-4">
-    <!-- Person Header -->
-    <div class="row mb-4">
-        <div class="col-md-4">
-            #if(person.profilePath):
-            <img src="https://image.tmdb.org/t/p/w300#(person.profilePath)" alt="#(person.name)" class="img-fluid rounded">
-                #endif
-        </div>
-        <div class="col-md-8">
-            <h1>#(person.name)</h1>
-            <div class="mb-3">
-                <p>
-                <strong>Original Name:</strong> #(person.originalName)<br>
-                <strong>Known For:</strong> #(person.knownForDepartment)<br>
-                <strong>Gender:</strong> #(person.gender)<br>
-                <strong>Adult:</strong> #(person.adult)<br>
-                <strong>Popularity:</strong> #(person.popularity)
-                </p>
-            </div>
-        </div>
-    </div>
-    
+    <!-- Person Info -->
+    #extend("Components/_person_info")
+    <!-- Person Info -->
+
     <!-- Acting Credits -->
-    #if(count(person.actingCredits) > 0):
-    <div class="mb-4">
-        <h2>Acting Credits</h2>
-        <div class="row">
-            #for(credit in person.actingCredits):
-            <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-3">
-                <a href="/movies/#(credit.id)" class="text-decoration-none text-reset">
-                    <div class="card h-100">
-                        #if(credit.posterPath):
-                        <img src="https://image.tmdb.org/t/p/w200#(credit.posterPath)" class="card-img-top" alt="#(credit.title)">
-                            #endif
-                            <div class="card-body">
-                                <h5 class="card-title">#(credit.title)</h5>
-                                <p class="card-text">
-                                <strong>Character:</strong> #(credit.character)<br>
-                                <strong>Order:</strong> #(credit.order)<br>
-                                <strong>Credit ID:</strong> #(credit.creditId)
-                                </p>
-                            </div>
-                    </div>
-                </a>
-            </div>
-            #endfor
-        </div>
-    </div>
-    #endif
-    
+    #extend("Components/_person_acting_credits")
+    <!-- Acting Credits -->
+
     <!-- Directing Credits -->
-    #if(count(person.directingCredits) > 0):
-    <div class="mb-4">
-        <h2>Directing Credits</h2>
-        <div class="row">
-            #for(credit in person.directingCredits):
-            <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-3">
-                <a href="/movies/#(credit.id)" class="text-decoration-none text-reset">
-                    <div class="card h-100">
-                        #if(credit.posterPath):
-                        <img src="https://image.tmdb.org/t/p/w200#(credit.posterPath)" class="card-img-top" alt="#(credit.title)">
-                            #endif
-                            <div class="card-body">
-                                <h5 class="card-title">#(credit.title)</h5>
-                                <p class="card-text">
-                                <strong>Credit ID:</strong> #(credit.creditId)
-                                </p>
-                            </div>
-                    </div>
-                </a>
-            </div>
-            #endfor
-        </div>
-    </div>
-    #endif
+    #extend("Components/_person_directing_credits")
+    <!-- Directing Credits -->
 </div>
 #endexport
 #endextend

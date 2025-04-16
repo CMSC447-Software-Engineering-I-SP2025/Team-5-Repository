@@ -50,4 +50,5 @@ func routes(_ app: Application) throws {
     // App controllers
     try app.register(collection: MovieController(sessionProtected: sessionProtected))
     try app.register(collection: PeopleController(sessionProtected: sessionProtected))
+    try app.register(collection: MovieFavoriteController(sessionProtected: sessionProtected))
 }

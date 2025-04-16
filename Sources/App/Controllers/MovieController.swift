@@ -98,6 +98,9 @@ struct MovieController: RouteCollection, @unchecked Sendable {
         let page = query.page ?? 1
         let perPage = query.perPage ?? 36
         
+        // Get current user if authenticated
+        let user = try await req.auth.get(Token.self)?.$user.get(on: req.db)
+        
         // build query
         var dbQuery = Movie.query(on: req.db)
         
@@ -145,22 +148,32 @@ struct MovieController: RouteCollection, @unchecked Sendable {
         // Paginate movies
         let movies = try await dbQuery.page(withIndex: page, size: perPage)
         
+        // Get favorite status for each movie if user is logged in
+        var movieDTOs: [ListMovieDTO] = []
+        for movie in movies.items {
+            var isFavorited: Bool? = nil
+            if let user = user {
+                isFavorited = try await UserMovieFavorite.query(on: req.db)
+                    .filter(\.$user.$id == user.requireID())
+                    .filter(\.$movie.$id == movie.id ?? 0)
+                    .first() != nil
+            }
+            movieDTOs.append(movie.toListDTO(isFavorited: isFavorited))
+        }
+        
         // Fetch all Genres, Languages, and Production Countries (for filter view)
         let genres = try await Genre.query(on: req.db).sort(\.$name).all().compactMap(\.toDTO)
         let languages = try await SpokenLanguage.query(on: req.db).sort(\.$englishName).all().compactMap((\.toDTO))
         let countries = try await ProductionCountry.query(on: req.db).sort(\.$name).all().compactMap(\.toDTO)
         
-        
         // Final Response
-        let user = try await req.auth.get(Token.self)?.$user.get(on: req.db)
         return MovieSearchResponse(query: query,
                                    pages: movies.metadata.pageCount,
-                                   movies: movies.items.compactMap({ $0.toListDTO() }),
+                                   movies: movieDTOs,
                                    genres: genres,
                                    languages: languages,
                                    countries: countries,
                                    user: user)
-        
     }
     
     @Sendable
@@ -186,7 +199,17 @@ struct MovieController: RouteCollection, @unchecked Sendable {
         else {
             throw Abort(.notFound)
         }
-        return movie.toDTO()
+        
+        // Get favorite status if user is logged in
+        var isFavorited: Bool? = nil
+        if let user = try await req.auth.get(Token.self)?.$user.get(on: req.db) {
+            isFavorited = try await UserMovieFavorite.query(on: req.db)
+                .filter(\.$user.$id == user.requireID())
+                .filter(\.$movie.$id == movieId)
+                .first() != nil
+        }
+        
+        return movie.toDTO(isFavorited: isFavorited)
     }
     
     @Sendable
