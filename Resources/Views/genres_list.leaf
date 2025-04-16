@@ -1,0 +1,8 @@
+#extend("base"):
+    #export("body"):
+        <h1>Genres</h1>
+            #for(genre in genres):
+                <a class="nav-link" href="/genres/#(genre.name)">#(genre.name)</a>
+            #endfor
+    #endexport
+#endextend
