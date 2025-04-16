@@ -16,6 +16,9 @@ final class User: Model, Content, @unchecked Sendable {
     @Field(key: "password_hash")
     var passwordHash: String
     
+    @Siblings(through: UserMovieFavorite.self, from: \.$user, to: \.$movie)
+    var favoriteMovies: [Movie]
+    
     init() { }
     init (id: UUID? = nil, name: String, email: String, passwordHash: String) {
         self.id = id

@@ -1,13 +1,13 @@
-<nav class="mb-5 bg-gradient-to-r from-blue-100 to-blue-300 shadow-md rounded-full sticky top-0 z-10">
+<nav class="mt-5 mb-8 border-2 border-black bg-white shadow-md rounded-full sticky top-0 z-10">
     <div class="container mx-auto px-6 py-3">
         <div class="flex items-center justify-between">
 
-            <a class="text-xl md:text-2xl font-semibold text-blue-900 hover:text-blue-700 transition duration-300"
+            <a class="text-xl md:text-2xl font-semibold text-blue-900 hover:text-black transition duration-300"
                href="/">#(meta.title)</a>
 
             <button id="navbar-toggler"
                     class="md:hidden focus:outline-none focus:ring-2 focus:ring-blue-500 rounded hover:bg-blue-200 transition duration-300">
-                <svg class="h-6 w-6 text-blue-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                <svg class="h-6 w-6 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24"
                      xmlns="http://www.w3.org/2000/svg">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                           d="M4 6h16M4 12h16M4 18h16"></path>
@@ -15,17 +15,16 @@
             </button>
 
             <div id="navbar-content" class="hidden md:flex items-center space-x-4 md:space-x-6">
-
                 <div class="flex space-x-3 md:space-x-4">
-                    <a class="text-blue-700 hover:bg-blue-200 hover:text-blue-900 py-2 px-3 rounded-full transition duration-300"
+                    <a class="text-black hover:bg-blue-200 hover:text-blue-900 py-2 px-3 rounded-full transition duration-300"
                        href="/movies">Movies</a>
-                    <a class="text-blue-700 hover:bg-blue-200 hover:text-blue-900 py-2 px-3 rounded-full transition duration-300"
-                       href="/people">People</a>
+                    <a class="text-black hover:bg-blue-200 hover:text-blue-900 py-2 px-3 rounded-full transition duration-300"
+                       href="/people/1">People</a>
                 </div>
 
                 <div class="flex items-center space-x-3 md:space-x-4">
                     #if(meta.user):
-                    <a class="text-blue-700 hover:bg-blue-200 hover:text-blue-900 py-2 px-3 rounded-full transition duration-300"
+                    <a class="text-black hover:bg-blue-200 hover:text-blue-900 py-2 px-3 rounded-full transition duration-300"
                        href="/profile">#(meta.user.name)</a>
                     <form class="inline-block" method="GET" action="/logout">
                         <button type="submit"
@@ -34,9 +33,9 @@
                         </button>
                     </form>
                     #else:
-                    <a class="text-blue-700 hover:bg-blue-200 hover:text-blue-900 py-2 px-3 rounded-full transition duration-300 text-sm md:text-base"
+                    <a class="text-black hover:bg-blue-200 hover:text-blue-900 py-2 px-3 rounded-full transition duration-300 text-sm md:text-base"
                        href="/login">Login</a>
-                    <a class="bg-green-500 hover:bg-green-700 hover:scale-105 hover:shadow-lg text-white font-semibold py-2 px-3 rounded-full focus:outline-none focus:ring-2 focus:ring-green-400 transition duration-200 text-sm md:text-base"
+                    <a id="hoverBtn" class="bg-gradient-to-r from-blue-100 to-blue-300"
                        href="/register">Create Account</a>
                     #endif
                 </div>

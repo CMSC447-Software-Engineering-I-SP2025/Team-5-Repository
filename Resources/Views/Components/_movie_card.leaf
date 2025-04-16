@@ -7,9 +7,18 @@
                     <img class="movie-poster" src="https://image.tmdb.org/t/p/w500#(movie.poster_path)" alt="#(movie.title) poster" onerror="this.src='/images/default-poster.jpg';">
                 </div>
                 <div class="movie-info">
-                    <h2 class="movie-title">#(movie.title)</h2>
+                    <div class="flex justify-between items-start">
+                        <h2 class="movie-title">#(movie.title)</h2>
+                        <button
+                            class="favorite-btn p-2 rounded-full hover:bg-gray-100 hover:scale-110 transition-all duration-200 focus:outline-none"
+                            data-movie-id="#(movie.id)"
+                            onclick="toggleFavorite(event, #(movie.id))"
+                            #if(!meta.user): data-requires-auth="true" #endif
+                            >
+                            <i class="fa #if(movie.isFavorited): fa-heart text-red-500 #else: fa-heart-o #endif"></i>
+                        </button>
+                    </div>
                     <div class="movie-year">#date(movie.release_date, "YYYY-MM-dd")</div>
-
                     <div>
                       #if(count(movie.genres) > 0):
                         <div class="mt-2 flex flex-wrap gap-1">

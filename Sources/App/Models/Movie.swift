@@ -89,6 +89,9 @@ final class Movie: Model, @unchecked Sendable {
     @Siblings(through: MovieDirector.self, from: \.$movie, to: \.$director)
     var directors: [Person]
     
+    @Siblings(through: UserMovieFavorite.self, from: \.$movie, to: \.$user)
+    var favoritedByUsers: [User]
+    
     init() { self.id = 0 }
     
     init(id: Int, adult: Bool, backdropPath: String?,
@@ -126,7 +129,7 @@ final class Movie: Model, @unchecked Sendable {
 
 
 extension Movie {
-    func toDTO() -> MovieDTO {
+    func toDTO(isFavorited: Bool? = nil) -> MovieDTO {
         .init(adult: adult,
               backdropPath: backdropPath,
               belongsToCollection: belongsToCollection?.toDTO,
@@ -154,10 +157,11 @@ extension Movie {
               voteAverage: voteAverage,
               voteCount: voteCount,
               cast: $cast.pivots.map(\.toDTO),
-              directors: $directors.pivots.map(\.toDTO))
+              directors: $directors.pivots.map(\.toDTO),
+              isFavorited: isFavorited)
     }
     
-    func toListDTO() -> ListMovieDTO {
+    func toListDTO(isFavorited: Bool? = nil) -> ListMovieDTO {
         .init(adult: adult,
               backdropPath: backdropPath,
               budget: budget,
@@ -178,7 +182,8 @@ extension Movie {
               title: title,
               video: video,
               voteAverage: voteAverage,
-              voteCount: voteCount)
+              voteCount: voteCount,
+              isFavorited: isFavorited)
     }
 }
 
