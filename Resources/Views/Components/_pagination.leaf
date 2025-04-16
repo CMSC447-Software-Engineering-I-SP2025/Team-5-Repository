@@ -1,0 +1,23 @@
+<div class="pagination">
+    #if(query.page > 1):
+    <a
+        id="hoverBtn"
+        href="/movies?page=#(query.page - 1)&per_page=#(query.per_page)#if(query.minimum_rating):&min_rating=#(query.minimum_rating)#endif#if(query.start_date):&start_date=#date(query.start_date, "YYYY-MM-dd")#endif#if(query.end_date):&end_date=#date(query.end_date, "YYYY-MM-dd")#endif#if(query.selected_genres):#for(genre in query.selected_genres):&selected_genres=#(genre)#endfor#endif#if(query.selected_countries):#for(country in query.selected_countries):&selected_countries=#(country)#endfor#endif#if(query.selected_languages):#for(language in query.selected_languages):&selected_languages=#(language)#endfor#endif"
+        class="pagination-button">
+        Previous
+    </a>
+    #else:
+    <button disabled id="hoverBtn" class="pagination-button">Previous</button>
+    #endif
+    <span class="page-info">Page #(query.page) of #(pages)</span>
+    #if(query.page < pages):
+    <a
+        id="hoverBtn"
+        href="/movies?page=#(query.page + 1)&per_page=#(query.per_page)#if(query.minimum_rating):&min_rating=#(query.minimum_rating)#endif#if(query.start_date):&start_date=#date(query.start_date, "YYYY-MM-dd")#endif#if(query.end_date):&end_date=#date(query.end_date, "YYYY-MM-dd")#endif#if(query.selected_genres):#for(genre in query.selected_genres):&selected_genres=#(genre)#endfor#endif#if(query.selected_countries):#for(country in query.selected_countries):&selected_countries=#(country)#endfor#endif#if(query.selected_languages):#for(language in query.selected_languages):&selected_languages=#(language)#endfor#endif"
+        class="pagination-button">
+        Next
+    </a>
+    #else:
+        <button disabled id="hoverBtn" class="pagination-button">Next</button>
+    #endif
+</div>

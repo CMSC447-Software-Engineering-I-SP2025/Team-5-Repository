@@ -1,0 +1,66 @@
+<form class="filter-form" id="filter-form" method="GET" action="/movies">
+    <div>
+        <div > <h2 class="text-4xl text-black mb-4">Filter Movies</h2> </div>
+        <label for="minimum_rating">Minimum Rating (0-10):</label>
+        <input class="focus:outline-none" type="number" id="minimum_rating" name="minimum_rating" min="0" max="10" step="0.1" value="#(query.minimum_rating)" placeholder="e.g., 7.5">
+    </div>
+    <div>
+        <label for="start_date">Date Range Start:</label>
+        <input class="focus:outline-none" type="date" id="start_date" name="start_date" value=
+        #if(query.start_date):
+        #date(query.start_date, "YYYY-MM-dd")
+        #endif
+        >
+        <label for="end_date">End:</label>
+        <input class="focus:outline-none" type="date" id="end_date" name="end_date" value=
+            #if(query.end_date):
+            #date(query.end_date, "YYYY-MM-dd")
+            #endif
+        >
+    </div>
+    <div>
+        <label for="selected_genres">Genres:</label>
+        <select class="focus:outline-none" id="selected_genres" name="selected_genres" multiple>
+            #for(genre in genres):
+            <option value="#(genre.id)"
+                #if(query.selected_genres): #if(contains(query.selected_genres, genre.id)):
+                        selected
+                #endif #endif
+                >
+                #(genre.name)
+            </option>
+            #endfor
+        </select>
+    </div>
+    <div>
+        <label for="selected_countries">Production Country:</label>
+        <select class="focus:outline-none" id="selected_countries" name="selected_countries" multiple>
+            #for(country in countries):
+            <option value="#(country.iso_3166_1)"
+                #if(query.selected_countries): #if(contains(query.selected_countries, country.iso_3166_1)):
+                    selected
+                #endif #endif
+                >
+                #(country.name)
+            </option>
+            #endfor
+        </select>
+    </div>
+    <div>
+        <label for="selected_languages">Languages:</label>
+        <select class="focus:outline-none" id="selected_languages" name="selected_languages" multiple>
+            #for(language in languages):
+            <option value="#(language.iso_639_1)"
+                #if(query.selected_languages): #if(contains(query.selected_languages, language.iso_639_1)):
+                selected
+                #endif #endif
+                >
+                #(language.english_name)
+            </option>
+            #endfor
+        </select>
+    </div>
+    <div>
+        <button type="submit" id="hoverBtn">Apply Filters</button>
+    </div>
+</form> 

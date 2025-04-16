@@ -16,6 +16,9 @@ final class User: Model, Content, @unchecked Sendable {
     @Field(key: "password_hash")
     var passwordHash: String
     
+    @Siblings(through: UserMovieFavorite.self, from: \.$user, to: \.$movie)
+    var favoriteMovies: [Movie]
+    
     init() { }
     init (id: UUID? = nil, name: String, email: String, passwordHash: String) {
         self.id = id
@@ -38,5 +41,14 @@ extension User: ModelAuthenticatable {
     
     func verify(password: String) throws -> Bool {
         try Bcrypt.verify(password, created: self.passwordHash)
+    }
+}
+
+// Favorites
+extension User {
+    func favoriteMovieIds(on db: Database) async throws -> [Int] {
+        try await UserMovieFavorite.query(on: db)
+            .filter(\.$user.$id == requireID())
+            .all(\.$movie.$id)
     }
 }

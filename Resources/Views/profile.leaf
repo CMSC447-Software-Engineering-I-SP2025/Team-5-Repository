@@ -1,25 +1,34 @@
 #extend("base"):
     #export("body"):
-        <div class="row justify-content-center">
-          <div class="col-md-6">
-            <div class="card">
-              <div class="card-body">
-                <h3 class="card-title">#(meta.title)</h3>
+        <div class="mx-auto max-w-screen-xl px-4 py-16 sm:px-6 lg:px-8">
+            <div class="mx-auto max-w-lg">
+                <h1 class="text-2xl font-bold sm:text-3xl text-center">Hello #(meta.user.name)</h1>
 
-                <h4>User #(meta.user.name)</h4>
-                <li>Name: #(meta.user.name) </li>
-                <li>Email: #(meta.user.email)</li>
+                <div class="mt-8 space-y-4">
+                    <h4 class="text-lg font-semibold text-gray-800">User Information</h4>
+                    <ul class="list-none pl-0">
+                        <li class="text-gray-700">
+                            <span class="font-medium">Name:</span> #(meta.user.name)
+                        </li>
+                        <li class="text-gray-700">
+                            <span class="font-medium">Email:</span> #(meta.user.email)
+                        </li>
+                    </ul>
 
-                <br />
-
-                <h4>Actions</h4>
-                <div><a href="/register">Register</a></div>
-                <div><a href="/login">Login</a></div>
-                <div><a href="/logout">Logout</a></div>
+                    <h4 class="text-3xl text-center font-semibold text-gray-800 mt-6">Actions</h4>
+                    <div class="space-y-2">
+                        <a href="/register" class="block rounded-full px-5 py-3 text-sm font-medium text-gray-700 border border-gray-700 hover:bg-gray-700 hover:text-white hover:scale-105 hover:shadow-md transition duration-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50 text-center">
+                            Register
+                        </a>
+                        <a href="/login" class="block rounded-full px-5 py-3 text-sm font-medium text-gray-700 border border-gray-700 hover:bg-gray-700 hover:text-white hover:scale-105 hover:shadow-md transition duration-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50 text-center">
+                            Login
+                        </a>
+                        <a href="/logout" class="block rounded-full px-5 py-3 text-sm font-medium text-gray-700 border border-gray-700 hover:bg-gray-700 hover:text-white hover:scale-105 hover:shadow-md transition duration-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50 text-center">
+                            Logout
+                        </a>
+                    </div>
                 </div>
             </div>
-          </div>
         </div>
     #endexport
 #endextend
-

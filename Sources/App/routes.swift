@@ -22,9 +22,6 @@ func routes(_ app: Application) throws {
         return try await page.render(with: req)
     }
 
-   
-
-
     // Auth controllers
     try app.register(collection: LoginController(sessionEnabled: sessionEnabled))
     try app.register(collection: UserController(sessionProtected: sessionProtected))
@@ -33,4 +30,5 @@ func routes(_ app: Application) throws {
     // App controllers
     try app.register(collection: MovieController(sessionProtected: sessionProtected))
     try app.register(collection: PeopleController(sessionProtected: sessionProtected))
+    try app.register(collection: MovieFavoriteController(sessionProtected: sessionProtected))
 }
