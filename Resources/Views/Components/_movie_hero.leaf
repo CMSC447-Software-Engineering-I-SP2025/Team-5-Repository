@@ -16,7 +16,7 @@
             <div class="mb-4">
                 <p class="flex items-center text-gray-700 text-sm mb-3">
                     <i class="fa fa-calendar mr-2 text-gray-500"></i>
-                    <strong class="mr-1">Release Date:</strong> #(movie.release_date)
+                    <strong class="mr-1">Release Date:</strong> #date(movie.release_date, "YYYY-MM-dd")
                 </p>
                 <p class="flex items-center text-gray-700 text-sm mb-3">
                     <i class="fa fa-clock-o mr-2 text-gray-500"></i>
