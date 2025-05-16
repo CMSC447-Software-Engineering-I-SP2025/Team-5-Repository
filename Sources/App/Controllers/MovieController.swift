@@ -139,7 +139,7 @@ struct MovieController: RouteCollection, @unchecked Sendable {
                      pages: 1,
                      movies: movies.map(\.toListDTO),
                      favoriteMovieIds: try await user?.favoriteMovieIds(on: req.db) ?? [],
-                     user: nil)
+                     user: user)
     }
     
     @Sendable
