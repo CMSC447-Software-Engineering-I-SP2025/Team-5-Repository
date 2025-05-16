@@ -30,40 +30,57 @@ struct LoadDataCommand: AsyncCommand {
             print("Extraction of ZIP archive failed with error:\(error)")
         }
         
-        // Open file
-        let extractedPath = URL(fileURLWithPath: "/app/movie_dump.json")//.appending(path:"movie_dump.json")
-        let fileData = try Data(contentsOf: extractedPath)
         
-        // Remove file
-        try fileManager.removeItem(at: extractedPath)
-        
-        
-        // parse
-        var decoder = JSONDecoder()
-        decoder.dateDecodingStrategy = .custom { decoder in
-            let container = try decoder.singleValueContainer()
-            let dateString = try container.decode(String.self)
+        do {
+            // Open file
+            let extractedPath = URL(fileURLWithPath: "/app/movie_dump.json")//.appending(path:"movie_dump.json")
+            let fileData = try Data(contentsOf: extractedPath)
             
-            let formatter = DateFormatter()
-            formatter.dateFormat = "yyyy-MM-dd"
-            formatter.locale = Locale(identifier: "en_US_POSIX")
-            formatter.timeZone = TimeZone(secondsFromGMT: 0)
+            // Remove file
+            try fileManager.removeItem(at: extractedPath)
             
-            if let date = formatter.date(from: dateString) {
-                return date
-            } else {
-                throw DecodingError.dataCorruptedError(in: container, debugDescription: "Invalid date format: \(dateString)")
+            
+            // parse
+            var decoder = JSONDecoder()
+            decoder.dateDecodingStrategy = .custom { decoder in
+                let container = try decoder.singleValueContainer()
+                let dateString = try container.decode(String.self)
+                
+                let formatter = DateFormatter()
+                formatter.dateFormat = "yyyy-MM-dd"
+                formatter.locale = Locale(identifier: "en_US_POSIX")
+                formatter.timeZone = TimeZone(secondsFromGMT: 0)
+                
+                if let date = formatter.date(from: dateString) {
+                    return date
+                } else {
+                    throw DecodingError.dataCorruptedError(in: container, debugDescription: "Invalid date format: \(dateString)")
+                }
             }
+            
+            // decode
+            let parsedData = try decoder.decode([String: MovieDTO].self, from: fileData)
+            
+            try await parsedData.asyncForEach { key, movie in
+                context.console.print(key)
+                do {
+                    _ = try await Movie.createOrUpdate(on: context.application.db,
+                                                       from: movie)
+                } catch {
+                    // retry
+                    try? await Task.sleep(for: .milliseconds(500))
+                    _ = try await Movie.createOrUpdate(on: context.application.db,
+                                                       from: movie)
+                }
+            }
+        } catch {
+            print("Error parsing data and loading \(error)")
         }
         
-        // decode
-        let parsedData = try decoder.decode([String: MovieDTO].self, from: fileData)
+        print("Load elasticsearch... this may take some time")
+        let out = try await runShellCommand("python3 load_es.py")
+        print(out)
         
-        try await parsedData.asyncForEach { key, movie in
-            context.console.print(key)
-            _ = try await Movie.createOrUpdate(on: context.application.db,
-                                               from: movie)
-        }
     }
 }
 
