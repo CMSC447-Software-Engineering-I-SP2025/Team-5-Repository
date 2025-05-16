@@ -101,13 +101,15 @@ def loadrag(parsed_data):
         model="llama3.2:3b",
 #        ollama_api_url=os.getenv('OLLAMA_API_URL')
     )
-
-    vector_db  = ElasticsearchStore.from_documents(
-        documents,
-        embedding=embeddings,
-        es_url=ES_HOST,
-        index_name=index_name
-    )
+    logger.info(f"Loading {len(documents)} into vector db...")
+    for i in range(0, len(documents), 100): 
+        logger.info(f"Loading {i}:{i+100}")
+        vector_db  = ElasticsearchStore.from_documents(
+            documents[i:i+100],
+            embedding=embeddings,
+            es_url=ES_HOST,
+            index_name=index_name
+        )
 #    # Check if the index already exists
 #    res = vector_db.client.indices.exists(index=index_name)
 #    if res.body:
