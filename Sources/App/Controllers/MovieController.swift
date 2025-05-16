@@ -128,7 +128,7 @@ struct MovieController: RouteCollection, @unchecked Sendable {
         }
         
         let page = (try? req.query.get(Int.self, at: "page")) ?? 1
-        let size = (try? req.query.get(Int.self, at: "size")) ?? 10
+        let size = (try? req.query.get(Int.self, at: "size")) ?? 30
         let from = max(0, (page - 1) * size)
         let searchQuery = (try? req.query.get(String.self, at: "q")) ?? ""
         var movies: [Movie] = []
@@ -158,6 +158,7 @@ struct MovieController: RouteCollection, @unchecked Sendable {
 
         // Get current user if authenticated
         let user = try await req.auth.get(Token.self)?.$user.get(on: req.db)
+        print("Found \(movies.count)")
         let out = MovieESSearchResponse(query: searchQuery,
                                         pages: 1,
                                         movies: movies.map(\.toListDTO),
