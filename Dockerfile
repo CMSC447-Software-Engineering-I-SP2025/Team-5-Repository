@@ -86,6 +86,9 @@ RUN if [ -f "/app/requirements.txt" ]; then pip3 install --no-cache-dir --break-
 COPY --chown=vapor:vapor movie_dump.zip* /app/
 RUN if [ -f "/app/movie_dump.zip" ]; then unzip /app/movie_dump.zip -d /app/; fi
 
+COPY --chown=vapor:vapor load_es.py* /app/
+COPY --chown=vapor:vapor rag_search.py* /app/
+
 # Provide configuration needed by the built-in crash reporter and some sensible default behaviors.
 ENV SWIFT_BACKTRACE=enable=yes,sanitize=yes,threads=all,images=all,interactive=no,swift-backtrace=./swift-backtrace-static
 

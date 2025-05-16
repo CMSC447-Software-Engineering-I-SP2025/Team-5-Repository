@@ -26,6 +26,9 @@ x-shared_environment: &shared_environment
   DATABASE_NAME: vapor_database
   DATABASE_USERNAME: vapor_username
   DATABASE_PASSWORD: vapor_password
+  ELASTICSEARCH_URL: http://elasticsearch:9200
+  OLLAMA_API_URL: http://ollama:11434
+  OLLAMA_HOST: http://ollama:11434
   
 services:
   app:
@@ -34,8 +37,6 @@ services:
       context: .
     environment:
       <<: *shared_environment
-      ELASTICSEARCH_URL: http://elasticsearch:9200
-      OLLAMA_API_URL: http://ollama:11434
     depends_on:
       - db
       - elasticsearch
@@ -53,6 +54,21 @@ services:
     depends_on:
       - db
     command: ["migrate", "--yes"]
+    deploy:
+      replicas: 0
+  loades:
+    image: template-fluent-postgres-leaf:latest
+    build:
+      context: .
+    environment:
+      <<: *shared_environment
+    depends_on:
+      - elasticsearch
+      - ollama
+    entrypoint: >
+      /bin/sh -c "
+        python3 load_es.py
+      "
     deploy:
       replicas: 0
   import:
@@ -118,15 +134,15 @@ services:
     ports:
       - '11434:11434'
     # Uncomment on windows to use GPU - way faster
-    # deploy:
-    #  resources:
-    #    reservations:
-    #      devices:
-    #        - driver: nvidia
-    #          count: all
-    #          capabilities: [gpu]
-    #  restart_policy:
-    #    condition: on-failure
+    deploy:
+     resources:
+       reservations:
+         devices:
+           - driver: nvidia
+             count: all
+             capabilities: [gpu]
+     restart_policy:
+       condition: on-failure
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:11434/api/health"]
       interval: 30s
