@@ -113,13 +113,40 @@ struct MovieController: RouteCollection, @unchecked Sendable {
             movie.delete(use: self.delete)
             movie.get(use: self.detail)
         }
+        
+        api.get("recommendations", use: self.recommendAPI)
 
         // View routes
         let movies = sessionProtected.grouped("movies")
         movies.get("es", use: self.esSearchView)
         movies.get(use: self.searchView)
         movies.get(":movieID", use: self.detailView)
+        movies.get("recommendations", use: self.recommendView)
     }
+    
+    @Sendable
+    func recommendAPI(req: Request) async throws -> MovieESSearchResponse {
+        let user = try await req.auth.get(Token.self)?.$user.get(on: req.db)
+        let titles = try await user?.favoriteMoviewTitles(on: req.db) ?? []
+        let results = try await runShellCommand("python3 rag_search.py \(titles)")
+        let recommendedTitles = try JSONDecoder().decode([String].self, from:   results.data(using: .utf8)!)
+        let movies = try await Movie.query(on: req.db)
+            .filter(\.$title ~~ recommendedTitles)
+            .with(\.$genres)
+            .all()
+        
+        return .init(query: "",
+                     pages: 1,
+                     movies: movies.map(\.toListDTO),
+                     favoriteMovieIds: try await user?.favoriteMovieIds(on: req.db) ?? [],
+                     user: nil)
+    }
+    
+    @Sendable
+    func recommendView(req: Request) async throws -> View {
+        try await recommendAPI(req: req).render(with: req)
+    }
+    
     
     @Sendable
     func esSearchAPI(req: Request) async throws -> MovieESSearchResponse {

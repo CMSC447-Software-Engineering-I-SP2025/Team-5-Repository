@@ -17,6 +17,8 @@
             <div id="navbar-content" class="hidden md:flex items-center space-x-4 md:space-x-6">
                 <div class="flex space-x-3 md:space-x-4">
                     <a class="text-black hover:bg-blue-200 hover:text-blue-900 py-2 px-3 rounded-full transition duration-300"
+                       href="/movies/recommendations">Recommendations</a>
+                    <a class="text-black hover:bg-blue-200 hover:text-blue-900 py-2 px-3 rounded-full transition duration-300"
                        href="/movies">Movies</a>
                     <a class="text-black hover:bg-blue-200 hover:text-blue-900 py-2 px-3 rounded-full transition duration-300"
                        href="/people/1">People</a>
