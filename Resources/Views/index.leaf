@@ -1,5 +1,13 @@
 #extend("base"):
     #export("body"):
         <h1>#(meta.description)</h1>
+        <form action="/movies/es" method="get" style="display: flex; width: 100%; max-width: 100%;">
+          <input type="text" name="q" placeholder="Search movies..." required
+                 style="flex: 1; padding: 0.5rem; font-size: 1rem; background-color: white; border: 1px solid #ccc; border-radius: 4px 0 0 4px;">
+          <button type="submit"
+                  style="padding: 0.5rem 1rem; font-size: 1rem; border: 1px solid #ccc; border-left: none; background-color: #eee; border-radius: 0 4px 4px 0;">
+            Search
+          </button>
+        </form>
     #endexport
 #endextend

@@ -21,6 +21,11 @@ func routes(_ app: Application) throws {
                                                    user: user))
         return try await page.render(with: req)
     }
+    
+    
+  
+
+
 
     // Auth controllers
     try app.register(collection: LoginController(sessionEnabled: sessionEnabled))

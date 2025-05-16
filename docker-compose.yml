@@ -17,6 +17,8 @@
 
 volumes:
   db_data:
+  elastic_data:
+  ollama_data:
 
 x-shared_environment: &shared_environment
   LOG_LEVEL: ${LOG_LEVEL:-debug}
@@ -24,6 +26,9 @@ x-shared_environment: &shared_environment
   DATABASE_NAME: vapor_database
   DATABASE_USERNAME: vapor_username
   DATABASE_PASSWORD: vapor_password
+  ELASTICSEARCH_URL: http://elasticsearch:9200
+  OLLAMA_API_URL: http://ollama:11434
+  OLLAMA_HOST: http://ollama:11434
   
 services:
   app:
@@ -34,6 +39,8 @@ services:
       <<: *shared_environment
     depends_on:
       - db
+      - elasticsearch
+      - ollama
     ports:
       - '8080:8080'
     # user: '0' # uncomment to run as root for testing purposes even though Dockerfile defines 'vapor' user.
@@ -47,6 +54,32 @@ services:
     depends_on:
       - db
     command: ["migrate", "--yes"]
+    deploy:
+      replicas: 0
+  loades:
+    image: template-fluent-postgres-leaf:latest
+    build:
+      context: .
+    environment:
+      <<: *shared_environment
+    depends_on:
+      - elasticsearch
+      - ollama
+    entrypoint: >
+      /bin/sh -c "
+        python3 load_es.py
+      "
+    deploy:
+      replicas: 0
+  import:
+    image: template-fluent-postgres-leaf:latest
+    build:
+      context: .
+    environment:
+      <<: *shared_environment
+    depends_on:
+      - db
+    command: ["import", "--log", "info"]
     deploy:
       replicas: 0
   revert:
@@ -71,3 +104,48 @@ services:
       POSTGRES_DB: vapor_database
     ports:
       - '5432:5432'
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:9.0.1
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    volumes:
+      - elastic_data:/usr/share/elasticsearch/data
+    ports:
+      - '9200:9200'
+      - '9300:9300'
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9200"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+  ollama:
+    image: ollama/ollama:latest
+    volumes:
+      - ollama_data:/root/.ollama
+    entrypoint: >
+      /bin/sh -c "
+        ollama serve &
+        sleep 10 &&
+        ollama pull llama3.2:3b &&
+        tail -f /dev/null
+      "
+    ports:
+      - '11434:11434'
+    # Uncomment on windows to use GPU - way faster
+    # deploy:
+    #  resources:
+    #    reservations:
+    #      devices:
+    #        - driver: nvidia
+    #          count: all
+    #          capabilities: [gpu]
+    #  restart_policy:
+    #    condition: on-failure
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:11434/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+#    command: serve

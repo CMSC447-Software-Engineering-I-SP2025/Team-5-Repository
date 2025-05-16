@@ -51,4 +51,12 @@ extension User {
             .filter(\.$user.$id == requireID())
             .all(\.$movie.$id)
     }
+    func favoriteMoviewTitles(on db: Database) async throws -> [String] {
+        let ids = try await UserMovieFavorite.query(on: db)
+            .filter(\.$user.$id == requireID())
+            .all(\.$movie.$id)
+        return try await Movie.query(on: db)
+            .filter(\.$id ~~ ids)
+            .all(\.$title)
+    }
 }

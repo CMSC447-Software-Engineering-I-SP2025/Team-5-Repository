@@ -1,0 +1,11 @@
+langchain_text_splitters
+langchain
+langchain-community
+langchain-core 
+requests 
+elasticsearch==8.17.0 
+dotenv 
+jq 
+langchain_elasticsearch 
+langchain_ollama 
+langgraph
