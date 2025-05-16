@@ -60,6 +60,10 @@ RUN export DEBIAN_FRONTEND=noninteractive DEBCONF_NONINTERACTIVE_SEEN=true \
       libjemalloc2 \
       ca-certificates \
       tzdata \
+      python3 \
+      python3-pip \
+      python3-dev \
+      unzip \
 # If your app or its dependencies import FoundationNetworking, also install `libcurl4`.
       # libcurl4 \
 # If your app or its dependencies import FoundationXML, also install `libxml2`.
@@ -74,6 +78,13 @@ WORKDIR /app
 
 # Copy built executable and any staged resources from builder
 COPY --from=build --chown=vapor:vapor /staging /app
+
+# Copy requirements.txt if it exists and install Python dependencies
+COPY --chown=vapor:vapor requirements.txt* /app/
+RUN if [ -f "/app/requirements.txt" ]; then pip3 install --no-cache-dir --break-system-packages -r /app/requirements.txt; fi
+
+COPY --chown=vapor:vapor movie_dump.zip* /app/
+RUN if [ -f "/app/movie_dump.zip" ]; then unzip /app/movie_dump.zip -d /app/; fi
 
 # Provide configuration needed by the built-in crash reporter and some sensible default behaviors.
 ENV SWIFT_BACKTRACE=enable=yes,sanitize=yes,threads=all,images=all,interactive=no,swift-backtrace=./swift-backtrace-static

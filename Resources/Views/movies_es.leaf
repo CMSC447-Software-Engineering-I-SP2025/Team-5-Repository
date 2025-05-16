@@ -1,0 +1,7 @@
+#extend("base"):
+    #export("body"):
+        <!-- Movie Display -->
+        #extend("Components/_movie_card")
+        <!-- Movie Display -->
+    #endexport
+#endextend

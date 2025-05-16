@@ -1,0 +1,9 @@
+elasticsearch
+requests
+langchain
+dotenv
+langchain_community
+langchain_elasticsearch
+langchain_ollama
+langchain_text_splitters
+jq

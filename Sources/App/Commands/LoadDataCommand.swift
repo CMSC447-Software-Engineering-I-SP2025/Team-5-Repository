@@ -24,14 +24,14 @@ struct LoadDataCommand: AsyncCommand {
         var destinationURL = URL(fileURLWithPath: currentWorkingPath)
         
         do {
-            let res = try await runShellCommand("unzip movie_dump.zip")
+            let res = try await runShellCommand("unzip /app/movie_dump.zip")
             context.console.print(res)
         } catch {
             print("Extraction of ZIP archive failed with error:\(error)")
         }
         
         // Open file
-        let extractedPath = URL(fileURLWithPath: currentWorkingPath).appending(path:"movie_dump.json")
+        let extractedPath = URL(fileURLWithPath: "/app/movie_dump.json")//.appending(path:"movie_dump.json")
         let fileData = try Data(contentsOf: extractedPath)
         
         // Remove file
