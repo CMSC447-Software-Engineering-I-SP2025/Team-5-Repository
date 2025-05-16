@@ -1,4 +1,4 @@
-import os
+import os,sys
 from dotenv import load_dotenv
 from pathlib import Path
 
@@ -53,13 +53,11 @@ def generate(state: State):
     response = llm.invoke(prompt)
     return {"answer": response.content}
 
-
 # Compile application and test
 graph_builder = StateGraph(State).add_sequence([retrieve, generate])
 graph_builder.add_edge(START, "retrieve")
 graph = graph_builder.compile()
 
-question = "Give me a list of 10 movie titles for movies most similar to Star Wars: Empire Strikes Back.  Format the list as just an array of title strings"
-print(question)
+question = f"Give me a list of 20 movie titles for movies most similar to {sys.argv[1]}.  Format the list as just a json array of title strings"
 response = graph.invoke({"question": question})
 print(response["answer"])
